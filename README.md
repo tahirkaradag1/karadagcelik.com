@@ -37,6 +37,13 @@ Sitenin ana deneyimi iki kapi uzerine kuruldu:
   - `prototype/api/quote.php`
   - `prototype/api/contact.php`
   - `prototype/api/order.php`
+- MySQL veritabani semasi ve kayit katmani
+- Tek seferlik guvenli veritabani kurulum sihirbazi
+- Firma ici yonetim paneli:
+  - Teklif talepleri
+  - Siparis talepleri
+  - Iletisim mesajlari
+  - Dosya indirme ve durum takibi
 
 ## Sonraki Evre
 

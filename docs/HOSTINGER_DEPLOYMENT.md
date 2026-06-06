@@ -97,3 +97,31 @@ Gercek tam sistem icin sonraki evrede:
 - Siparis ve teklif takip paneli
 
 baglanacaktir.
+
+## MySQL ve Yonetim Paneli Kurulumu
+
+WordPress veritabanini kullanmak yerine Karadag Celik platformu icin ayri bir
+MySQL veritabani ve kullanicisi olusturulmalidir.
+
+1. Hostinger `Databases -> MySQL Databases` ekraninda yeni veritabani olustur.
+2. Guclu ve benzersiz bir veritabani parolasi belirle.
+3. Guncel `api/` ve `admin/` klasorlerini test sitesine yukle.
+4. Gizli kurulum anahtariyla `admin/install.php` sayfasini ac.
+5. MySQL bilgilerini ve ilk yonetici hesabini kurulum formuna gir.
+6. Kurulumdan sonra `admin/login.php` uzerinden giris yap.
+
+Kurulum sihirbazi:
+
+- Gerekli tablolari otomatik olusturur.
+- Veritabani parolasini GitHub'a girmeyen `api/database.local.php` dosyasinda saklar.
+- Ilk yonetici parolasini geri dondurulemez bir parola ozeti olarak saklar.
+- Kurulum tamamlandiktan sonra ikinci bir yonetici olusturulmasina izin vermez.
+
+Yonetim panelinde:
+
+- Online teklif talepleri ve yuklenen dosyalar
+- Magaza siparis talepleri ve urun kalemleri
+- Iletisim mesajlari
+- Kayit durumlari
+
+goruntulenebilir.

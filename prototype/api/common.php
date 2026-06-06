@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/database.php';
+
 function kc_config(): array
 {
     $default = [
@@ -13,17 +15,36 @@ function kc_config(): array
         'upload_dir' => dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',
         'max_file_bytes' => 25 * 1024 * 1024,
         'allowed_extensions' => ['dxf', 'dwg', 'pdf', 'step', 'stp', 'iges', 'igs', 'zip', 'rar', 'jpg', 'jpeg', 'png'],
+        'setup_key' => '',
+        'database' => [
+            'host' => '',
+            'port' => 3306,
+            'name' => '',
+            'user' => '',
+            'password' => '',
+            'charset' => 'utf8mb4',
+        ],
     ];
 
     $file = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
     if (is_file($file)) {
         $custom = require $file;
-        if (is_array($custom)) {
-            return array_replace_recursive($default, $custom);
+    }
+
+    $config = $default;
+    if (isset($custom) && is_array($custom)) {
+        $config = array_replace_recursive($config, $custom);
+    }
+
+    $databaseFile = __DIR__ . DIRECTORY_SEPARATOR . 'database.local.php';
+    if (is_file($databaseFile)) {
+        $database = require $databaseFile;
+        if (is_array($database)) {
+            $config['database'] = array_replace($config['database'], $database);
         }
     }
 
-    return $default;
+    return $config;
 }
 
 function kc_json(array $payload, int $status = 200): void

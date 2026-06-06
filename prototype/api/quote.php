@@ -45,6 +45,7 @@ $metadata = [
 ];
 
 kc_store_metadata($requestId, $metadata, $config);
+$databaseSaved = kc_db_store_quote($config, $metadata);
 
 $fileLines = $files
     ? implode("\n", array_map(fn($file) => '- ' . $file['original_name'] . ' (' . $file['stored_name'] . ')', $files))
@@ -76,6 +77,7 @@ Not: Dosyalar sunucudaki ozel yukleme klasorune kaydedildi. Admin panel baglanan
 MAIL;
 
 $internalSent = kc_send_mail((array)$config['notification_emails'], 'Yeni Online Teklif Talebi - ' . $requestId, $body, $config, $email);
+kc_db_set_mail_status($config, 'quote_requests', 'request_code', $requestId, $internalSent);
 
 $customerBody = <<<MAIL
 Merhaba {$name},
@@ -105,5 +107,6 @@ kc_json([
     'ok' => true,
     'request_id' => $requestId,
     'mail_sent' => $internalSent,
+    'database_saved' => $databaseSaved,
     'message' => 'Teklif talebiniz alindi.',
 ]);

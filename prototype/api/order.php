@@ -50,6 +50,7 @@ $metadata = [
 ];
 
 kc_store_metadata($requestId, $metadata, $config);
+$databaseSaved = kc_db_store_order($config, $metadata);
 
 $body = <<<MAIL
 Yeni magaza siparis talebi alindi.
@@ -72,6 +73,7 @@ Not: Canli odeme entegrasyonu henuz baglanmadi. Bu kayit magaza siparis talebi o
 MAIL;
 
 $internalSent = kc_send_mail((array)$config['notification_emails'], 'Yeni Magaza Siparis Talebi - ' . $requestId, $body, $config, $email);
+kc_db_set_mail_status($config, 'orders', 'order_code', $requestId, $internalSent);
 
 $customerBody = <<<MAIL
 Merhaba {$name},
@@ -102,5 +104,6 @@ kc_json([
     'ok' => true,
     'request_id' => $requestId,
     'mail_sent' => $internalSent,
+    'database_saved' => $databaseSaved,
     'message' => 'Siparis talebiniz alindi.',
 ]);

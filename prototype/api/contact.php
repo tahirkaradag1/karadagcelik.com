@@ -28,6 +28,7 @@ $metadata = [
 ];
 
 kc_store_metadata($requestId, $metadata, $config);
+$databaseSaved = kc_db_store_contact($config, $metadata);
 
 $body = <<<MAIL
 Yeni iletisim mesaji alindi.
@@ -42,6 +43,7 @@ Mesaj:
 MAIL;
 
 $sent = kc_send_mail((array)$config['notification_emails'], 'Yeni Iletisim Mesaji - ' . $requestId, $body, $config, $email);
+kc_db_set_mail_status($config, 'contact_messages', 'message_code', $requestId, $sent);
 
 if (!$sent) {
     kc_json([
@@ -56,5 +58,6 @@ kc_json([
     'ok' => true,
     'request_id' => $requestId,
     'mail_sent' => $sent,
+    'database_saved' => $databaseSaved,
     'message' => 'Mesajiniz alindi.',
 ]);

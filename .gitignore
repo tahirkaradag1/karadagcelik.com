@@ -12,6 +12,7 @@ build/
 .DS_Store
 Thumbs.db
 prototype/api/config.php
+prototype/api/database.local.php
 prototype/api/private_uploads/
 karadag_private_uploads/
 

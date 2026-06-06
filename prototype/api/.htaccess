@@ -7,3 +7,7 @@ Options -Indexes
 <Files "config.example.php">
   Require all denied
 </Files>
+
+<FilesMatch "\.local\.php$">
+  Require all denied
+</FilesMatch>
