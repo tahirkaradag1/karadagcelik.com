@@ -12,7 +12,6 @@ $phone = kc_text('phone', 80);
 $email = kc_email('email');
 $address = kc_text('address', 1600);
 $itemsJson = (string)($_POST['items'] ?? '[]');
-$total = kc_text('total', 80);
 
 if ($name === '' || $phone === '' || $email === '' || $address === '') {
     kc_json(['ok' => false, 'message' => 'Ad soyad, telefon, e-posta ve adres zorunludur.'], 400);
@@ -23,6 +22,17 @@ if (!is_array($items) || count($items) === 0) {
     kc_json(['ok' => false, 'message' => 'Sepet bos gorunuyor.'], 400);
 }
 
+try {
+    $resolvedOrder = kc_db_resolve_order_items($config, $items);
+} catch (InvalidArgumentException $error) {
+    kc_json(['ok' => false, 'message' => $error->getMessage()], 400);
+} catch (Throwable $error) {
+    error_log('Order price resolution error: ' . $error->getMessage());
+    kc_json(['ok' => false, 'message' => 'Urun fiyatlari su anda dogrulanamiyor. Lutfen daha sonra tekrar deneyin.'], 503);
+}
+
+$items = $resolvedOrder['items'];
+$total = $resolvedOrder['total'];
 $requestId = kc_request_id('KCO');
 $lines = [];
 foreach ($items as $item) {
@@ -37,6 +47,7 @@ $itemText = implode("\n", $lines);
 $metadata = [
     'type' => 'store_order_request',
     'request_id' => $requestId,
+    'customer_id' => kc_current_customer_id(),
     'created_at' => date(DATE_ATOM),
     'customer' => [
         'name' => $name,
@@ -46,6 +57,8 @@ $metadata = [
     ],
     'items' => $items,
     'total' => $total,
+    'total_minor' => $resolvedOrder['total_minor'],
+    'currency' => $resolvedOrder['currency'],
     'payment_status' => 'payment_not_connected_yet',
 ];
 

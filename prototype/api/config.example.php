@@ -21,6 +21,11 @@ return [
         'password' => '',
         'charset' => 'utf8mb4',
     ],
+    'google' => [
+        'client_id' => '',
+        'client_secret' => '',
+        'redirect_uri' => 'https://karadagcelik.com/account/google-callback.php',
+    ],
     // Store uploads outside public_html when possible.
     // If this path is not writable, api/common.php falls back to a local private_uploads folder.
     'upload_dir' => dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',

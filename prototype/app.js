@@ -1,4 +1,4 @@
-const products = [
+const fallbackProducts = [
   {
     id: "makine-baglanti-plakasi",
     group: "industrial",
@@ -82,6 +82,8 @@ const products = [
   },
 ];
 
+let products = [...fallbackProducts];
+
 const state = {
   cart: JSON.parse(localStorage.getItem("kc_cart") || "[]"),
   activeProductId: products[0].id,
@@ -129,6 +131,35 @@ async function postForm(endpoint, formData) {
   return payload;
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function safeVisualType(value) {
+  return ["plate", "ring", "bracket", "rail"].includes(value) ? value : "plate";
+}
+
+async function loadProducts() {
+  if (isLocalPreview()) return;
+  try {
+    const response = await fetch("api/products.php", { headers: { Accept: "application/json" } });
+    const payload = await response.json();
+    if (response.ok && payload.ok && Array.isArray(payload.products) && payload.products.length) {
+      products = payload.products;
+      state.activeProductId = products[0].id;
+      state.cart = state.cart.filter((line) => products.some((product) => product.id === line.id));
+      saveCart();
+    }
+  } catch {
+    products = [...fallbackProducts];
+  }
+}
+
 function setHash(view, productId) {
   const nextHash = productId ? `#${view}/${productId}` : `#${view}`;
   if (window.location.hash !== nextHash) {
@@ -169,21 +200,26 @@ function routeFromHash() {
 }
 
 function productCard(product) {
+  const id = escapeHtml(product.id);
+  const name = escapeHtml(product.name);
+  const media = product.imageUrl
+    ? `<img src="${escapeHtml(product.imageUrl)}" alt="${name}" loading="lazy">`
+    : "<span></span>";
   return `
     <article class="product-card">
-      <button class="product-media ${product.type}" type="button" data-product-open="${product.id}" aria-label="${product.name} detay">
-        <span></span>
+      <button class="product-media ${safeVisualType(product.type)} ${product.imageUrl ? "has-image" : ""}" type="button" data-product-open="${id}" aria-label="${name} detay">
+        ${media}
       </button>
       <div class="product-body">
         <div class="product-meta">
-          <span>${product.tag}</span>
+          <span>${escapeHtml(product.tag)}</span>
           <strong>${formatPrice(product.price)}</strong>
         </div>
-        <h3>${product.name}</h3>
-        <p>${product.summary}</p>
+        <h3>${name}</h3>
+        <p>${escapeHtml(product.summary)}</p>
         <div class="product-actions">
-          <button class="text-button" type="button" data-product-open="${product.id}">Detaya bak</button>
-          <button class="round-action" type="button" data-add-cart="${product.id}" aria-label="${product.name} sepete ekle">
+          <button class="text-button" type="button" data-product-open="${id}">Detaya bak</button>
+          <button class="round-action" type="button" data-add-cart="${id}" aria-label="${name} sepete ekle">
             <svg><use href="#icon-plus"></use></svg>
           </button>
         </div>
@@ -205,17 +241,22 @@ function renderProducts() {
 
 function renderProductDetail(productId) {
   const product = products.find((item) => item.id === productId) || products[0];
+  if (!product) return;
   state.activeProductId = product.id;
   state.detailQty = 1;
+  const name = escapeHtml(product.name);
+  const media = product.imageUrl
+    ? `<img src="${escapeHtml(product.imageUrl)}" alt="${name}">`
+    : "<span></span>";
   document.getElementById("productDetail").innerHTML = `
     <div class="product-hero">
       <div class="product-stage">
-        <div class="product-media ${product.type}"><span></span></div>
+        <div class="product-media ${safeVisualType(product.type)} ${product.imageUrl ? "has-image" : ""}">${media}</div>
       </div>
       <div class="product-info">
-        <span class="eyebrow">${product.tag}</span>
-        <h1>${product.name}</h1>
-        <p>${product.detail}</p>
+        <span class="eyebrow">${escapeHtml(product.tag)}</span>
+        <h1>${name}</h1>
+        <p>${escapeHtml(product.detail)}</p>
         <strong class="product-price">${formatPrice(product.price)}</strong>
         <div>
           <span class="quantity-control" aria-label="Adet seçimi">
@@ -223,27 +264,27 @@ function renderProductDetail(productId) {
             <span id="detailQty">1</span>
             <button type="button" data-detail-qty="1" aria-label="Adet artir"><svg><use href="#icon-plus"></use></svg></button>
           </span>
-          <button class="primary-action" type="button" data-detail-add="${product.id}">Sepete ekle</button>
+          <button class="primary-action" type="button" data-detail-add="${escapeHtml(product.id)}">Sepete ekle</button>
         </div>
       </div>
     </div>
     <div class="section-heading">
       <span class="eyebrow">Ürün bilgisi</span>
-      <h2>${product.name} icin bilgi ve kaynak alani.</h2>
+      <h2>${name} icin bilgi ve kaynak alani.</h2>
       <p>Bu sayfa yapısı, ileride ürüne özel teknik bilgi, kullanım senaryoları ve soru cevap içerikleriyle genişletilmeye hazır.</p>
     </div>
     <div class="knowledge-columns">
       <article class="knowledge-card">
         <h3>Kullanım Alanları</h3>
-        <p>Ürünün hangi sektörlerde, hangi montaj koşullarında ve hangi ihtiyaçlarda kullanıldığını anlatan ayrıntılı alan.</p>
+        <p>${escapeHtml(product.knowledgeUsage || "Ürünün kullanıldığı sektörler ve montaj senaryoları burada anlatılabilir.")}</p>
       </article>
       <article class="knowledge-card">
         <h3>Malzeme ve Ölçü</h3>
-        <p>Malzeme seçimi, kalınlık, yüzey işlemi, tolerans ve üretim notları için teknik bilgi alanı.</p>
+        <p>${escapeHtml(product.knowledgeMaterial || "Malzeme, kalınlık, yüzey işlemi ve tolerans bilgileri burada tutulabilir.")}</p>
       </article>
       <article class="knowledge-card">
         <h3>Sık Sorular</h3>
-        <p>Yapay zeka aramalarında kaynak olabilecek net sorular ve ürüne özel cevaplar burada toplanır.</p>
+        <p>${escapeHtml(product.knowledgeFaq || "Ürüne özel sık sorulan sorular ve net cevaplar burada yayımlanabilir.")}</p>
       </article>
     </div>
   `;
@@ -311,10 +352,7 @@ function cartOrderItems() {
       if (!product) return null;
       return {
         id: product.id,
-        name: product.name,
         qty: line.qty,
-        price: formatPrice(product.price),
-        rawPrice: product.price,
       };
     })
     .filter(Boolean);
@@ -415,62 +453,111 @@ function closeCart() {
   drawerScrim.classList.remove("visible");
 }
 
-function renderProfile() {
-  const isLoggedIn = localStorage.getItem("kc_google_session") === "1";
-  if (!isLoggedIn) {
+function accountStatusLabel(status) {
+  return {
+    new: "Yeni",
+    in_review: "İnceleniyor",
+    quoted: "Teklif verildi",
+    confirmed: "Onaylandı",
+    preparing: "Hazırlanıyor",
+    shipped: "Kargolandı",
+    completed: "Tamamlandı",
+    cancelled: "İptal edildi",
+  }[status] || status;
+}
+
+function accountDate(value) {
+  return new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium" }).format(new Date(value.replace(" ", "T")));
+}
+
+async function renderProfile() {
+  profilePanel.innerHTML = `<div class="profile-loading">Hesap bilgileri yükleniyor...</div>`;
+  if (isLocalPreview()) {
     profilePanel.innerHTML = `
       <div class="google-card">
-        <div>
-          <h2>Google ile bağlan</h2>
-          <p>Karadağ Çelik hesabınız Google oturumu ile açılır. Ayrıca klasik üyelik formu bulunmaz.</p>
-        </div>
-        <button class="google-button" type="button" id="googleLogin">Google ile devam et</button>
-      </div>
-    `;
+        <div><h2>Google ile bağlan</h2><p>Gerçek müşteri hesabı canlı sunucuda Google bağlantısı tamamlandığında açılacak.</p></div>
+        <button class="google-button" type="button" disabled>Google bağlantısı hazırlanıyor</button>
+      </div>`;
     return;
   }
 
-  profilePanel.innerHTML = `
-    <div class="profile-dashboard">
-      <div class="profile-row">
-        <svg><use href="#icon-user"></use></svg>
-        <div>
-          <h3>Karadağ Çelik Müşterisi</h3>
-          <p>Google hesabı ile bağlı profil. Telefon, fatura ve teslimat bilgileri burada tutulur.</p>
+  try {
+    const response = await fetch("api/account.php", { headers: { Accept: "application/json" } });
+    const payload = await response.json();
+    if (!payload.logged_in) {
+      profilePanel.innerHTML = `
+        <div class="google-card">
+          <div>
+            <h2>Google ile bağlan</h2>
+            <p>Karadağ Çelik hesabınız yalnızca Google ile açılır. Ayrı bir üyelik parolası oluşturmanız gerekmez.</p>
+          </div>
+          ${payload.google_configured
+            ? `<a class="google-button" href="${escapeHtml(payload.login_url || "account/google-start.php")}">Google ile devam et</a>`
+            : `<button class="google-button" type="button" disabled>Google bağlantısı hazırlanıyor</button>`}
+        </div>`;
+      return;
+    }
+
+    const customer = payload.customer;
+    const addresses = payload.addresses || [];
+    const orders = payload.orders || [];
+    const quotes = payload.quotes || [];
+    profilePanel.innerHTML = `
+      <div class="profile-dashboard">
+        <div class="profile-account">
+          ${customer.avatar ? `<img src="${escapeHtml(customer.avatar)}" alt="">` : `<span class="profile-avatar">${escapeHtml(customer.name.charAt(0))}</span>`}
+          <div><h2>${escapeHtml(customer.name)}</h2><p>${escapeHtml(customer.email)}</p></div>
+          <a class="secondary-action" href="account/logout.php">Oturumu kapat</a>
         </div>
-      </div>
-      <div class="profile-row">
-        <svg><use href="#icon-map"></use></svg>
-        <div>
-          <h3>Kayıtlı Adresler</h3>
-          <p>Mersin teslimat adresi ve yeni adres ekleme alanı.</p>
+        <div class="account-stat-grid">
+          <div><strong>${quotes.length}</strong><span>Teklif talebi</span></div>
+          <div><strong>${orders.length}</strong><span>Sipariş</span></div>
+          <div><strong>${addresses.length}</strong><span>Kayıtlı adres</span></div>
         </div>
-      </div>
-      <div class="profile-row">
-        <svg><use href="#icon-file"></use></svg>
-        <div>
-          <h3>Teklif Talepleri</h3>
-          <p>KC-2401 inceleniyor, KC-2400 fiyatlandırıldı.</p>
-        </div>
-      </div>
-      <div class="profile-row">
-        <svg><use href="#icon-package"></use></svg>
-        <div>
-          <h3>Siparişler</h3>
-          <p>1 aktif üretim, 3 tamamlanan sipariş ve ödeme durumları.</p>
-        </div>
-      </div>
-      <div>
-        <span class="eyebrow">Yönetici özeti</span>
-        <div class="admin-strip">
-          <div class="admin-mini"><strong>12</strong><span>Yeni teklif</span></div>
-          <div class="admin-mini"><strong>5</strong><span>Aktif sipariş</span></div>
-          <div class="admin-mini"><strong>28</strong><span>Ürün kartı</span></div>
-        </div>
-      </div>
-      <button class="secondary-action" type="button" id="logoutProfile">Oturumu kapat</button>
-    </div>
-  `;
+        <section class="account-section">
+          <div class="account-heading"><div><span class="eyebrow">Teslimat</span><h3>Kayıtlı adresler</h3></div></div>
+          <div class="address-list">
+            ${addresses.length
+              ? addresses.map((address) => `<article><strong>${escapeHtml(address.label)}</strong><p>${escapeHtml(address.recipient_name)} · ${escapeHtml(address.phone)}</p><p>${escapeHtml(address.address_line)}, ${escapeHtml(address.district)}/${escapeHtml(address.city)}</p></article>`).join("")
+              : `<p class="account-empty">Henüz kayıtlı adresiniz yok.</p>`}
+          </div>
+          <details class="address-create">
+            <summary>Yeni adres ekle</summary>
+            <form id="addressForm" class="account-form">
+              <input type="hidden" name="csrf" value="${escapeHtml(payload.csrf)}">
+              <div class="account-form-grid">
+                <label>Adres etiketi<input name="label" placeholder="Ev, iş, fabrika"></label>
+                <label>Alıcı adı<input name="recipient_name" value="${escapeHtml(customer.name)}" required></label>
+                <label>Telefon<input name="phone" value="${escapeHtml(customer.phone || "")}" required></label>
+                <label>Şehir<input name="city" required></label>
+                <label>İlçe<input name="district" required></label>
+                <label>Posta kodu<input name="postal_code"></label>
+              </div>
+              <label>Açık adres<textarea name="address_line" rows="3" required></textarea></label>
+              <button class="primary-action" type="submit">Adresi kaydet</button>
+            </form>
+          </details>
+        </section>
+        <section class="account-section">
+          <div class="account-heading"><div><span class="eyebrow">Üretim talepleri</span><h3>Teklif geçmişi</h3></div></div>
+          <div class="account-records">
+            ${quotes.length
+              ? quotes.map((quote) => `<div><span><strong>${escapeHtml(quote.code)}</strong><small>${escapeHtml([quote.material, quote.thickness].filter(Boolean).join(" · ") || "Proje talebi")}</small></span><span><b>${escapeHtml(accountStatusLabel(quote.status))}</b><small>${accountDate(quote.created_at)}</small></span></div>`).join("")
+              : `<p class="account-empty">Henüz teklif talebiniz yok.</p>`}
+          </div>
+        </section>
+        <section class="account-section">
+          <div class="account-heading"><div><span class="eyebrow">Mağaza</span><h3>Sipariş geçmişi</h3></div></div>
+          <div class="account-records">
+            ${orders.length
+              ? orders.map((order) => `<div><span><strong>${escapeHtml(order.code)}</strong><small>${escapeHtml(order.total_text)}</small></span><span><b>${escapeHtml(accountStatusLabel(order.status))}</b><small>${accountDate(order.created_at)}</small></span></div>`).join("")
+              : `<p class="account-empty">Henüz mağaza siparişiniz yok.</p>`}
+          </div>
+        </section>
+      </div>`;
+  } catch {
+    profilePanel.innerHTML = `<div class="account-empty">Hesap bilgileri şu anda yüklenemiyor.</div>`;
+  }
 }
 
 function bindEvents() {
@@ -515,17 +602,6 @@ function bindEvents() {
       removeCartLine(cartRemove.dataset.cartRemove);
     }
 
-    if (event.target.id === "googleLogin") {
-      localStorage.setItem("kc_google_session", "1");
-      renderProfile();
-      showToast("Google girişi prototip olarak aktif edildi.");
-    }
-
-    if (event.target.id === "logoutProfile") {
-      localStorage.removeItem("kc_google_session");
-      renderProfile();
-      showToast("Oturum kapatıldı.");
-    }
   });
 
   document.getElementById("cartTrigger").addEventListener("click", openCart);
@@ -607,6 +683,23 @@ function bindEvents() {
   });
 
   document.body.addEventListener("submit", async (event) => {
+    if (event.target.id === "addressForm") {
+      event.preventDefault();
+      const form = event.target;
+      const button = form.querySelector("button[type='submit']");
+      button.disabled = true;
+      try {
+        const payload = await postForm("api/address.php", new FormData(form));
+        showToast(payload.message || "Adres kaydedildi.");
+        await renderProfile();
+      } catch (error) {
+        showToast(error.message);
+      } finally {
+        button.disabled = false;
+      }
+      return;
+    }
+
     if (event.target.id !== "orderForm") return;
     event.preventDefault();
 
@@ -643,8 +736,13 @@ function bindEvents() {
   window.addEventListener("hashchange", routeFromHash);
 }
 
-renderProducts();
-renderCart();
-renderProfile();
-bindEvents();
-routeFromHash();
+async function initialize() {
+  await loadProducts();
+  renderProducts();
+  renderCart();
+  await renderProfile();
+  bindEvents();
+  routeFromHash();
+}
+
+initialize();

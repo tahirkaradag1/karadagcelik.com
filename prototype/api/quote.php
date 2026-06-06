@@ -27,6 +27,7 @@ $files = kc_save_uploads('files', $requestId, $config);
 $metadata = [
     'type' => 'quote_request',
     'request_id' => $requestId,
+    'customer_id' => kc_current_customer_id(),
     'created_at' => date(DATE_ATOM),
     'customer' => [
         'name' => $name,

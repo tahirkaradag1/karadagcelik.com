@@ -38,7 +38,13 @@ function kc_admin_config(): array
 
 function kc_admin_pdo(): PDO
 {
-    return kc_db_required(kc_admin_config());
+    static $pdo;
+    if (!$pdo) {
+        $pdo = kc_db_required(kc_admin_config());
+        kc_install_schema($pdo);
+    }
+
+    return $pdo;
 }
 
 function kc_admin_user(): ?array
@@ -99,4 +105,3 @@ function kc_admin_datetime(string $value): string
     $timestamp = strtotime($value);
     return $timestamp ? date('d.m.Y H:i', $timestamp) : $value;
 }
-

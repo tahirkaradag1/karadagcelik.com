@@ -24,6 +24,11 @@ function kc_config(): array
             'password' => '',
             'charset' => 'utf8mb4',
         ],
+        'google' => [
+            'client_id' => '',
+            'client_secret' => '',
+            'redirect_uri' => '',
+        ],
     ];
 
     $file = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
@@ -97,6 +102,17 @@ function kc_email(string $key): string
 function kc_request_id(string $prefix): string
 {
     return $prefix . '-' . date('Ymd-His') . '-' . strtoupper(bin2hex(random_bytes(3)));
+}
+
+function kc_current_customer_id(): ?int
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_name('kc_customer_session');
+        session_start();
+    }
+
+    $id = (int)($_SESSION['kc_customer']['id'] ?? 0);
+    return $id > 0 ? $id : null;
 }
 
 function kc_ensure_dir(string $path): string

@@ -9,6 +9,8 @@ function kc_admin_page_start(string $title, string $active = ''): void
         'dashboard' => ['index.php', 'Genel Bakis'],
         'quotes' => ['quotes.php', 'Teklifler'],
         'orders' => ['orders.php', 'Siparisler'],
+        'products' => ['products.php', 'Urunler'],
+        'customers' => ['customers.php', 'Musteriler'],
         'messages' => ['messages.php', 'Mesajlar'],
     ];
     ?>
@@ -72,4 +74,3 @@ function kc_admin_status(string $status): string
         . kc_admin_escape(kc_admin_status_label($status))
         . '</span>';
 }
-

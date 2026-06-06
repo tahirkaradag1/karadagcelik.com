@@ -4,7 +4,9 @@ Karadag Celik icin WordPress/WooCommerce sinirlarindan cikarak ozel tasarimli on
 
 ## Mevcut Durum
 
-Bu repo su anda ilk MVP prototipini icerir. Prototip HTML/CSS/JS ile hazirlandi; Hostinger uzerinde PHP endpointleri ile teklif, iletisim ve magaza siparis talebi akislari canliya baglanabilir.
+Bu repo calisan PHP/MySQL MVP'sini icerir. Test kurulumu Hostinger uzerinde
+`/kc-test/` altinda calisir; formlar, e-posta bildirimleri ve yonetim paneli
+canli veritabanina baglidir.
 
 Ana prototip:
 
@@ -31,7 +33,7 @@ Sitenin ana deneyimi iki kapi uzerine kuruldu:
 - Urun bilgi/ansiklopedi bolumu altyapisi
 - Sepete ekleme
 - Sagdan acilan sepet paneli
-- Profil ve Google giris prototipi
+- Google ile giris ve musteri hesabi altyapisi
 - Iletisim sayfasi
 - PHP endpointleri:
   - `prototype/api/quote.php`
@@ -44,20 +46,21 @@ Sitenin ana deneyimi iki kapi uzerine kuruldu:
   - Siparis talepleri
   - Iletisim mesajlari
   - Dosya indirme ve durum takibi
+  - Urun ekleme, duzenleme ve yayindan kaldirma
+  - Musteri listesi
+- Veritabanindan yuklenen urun katalogu
+- Kayitli musteri adresleri, teklifleri ve siparisleri icin hesap API'si
+- Siparis fiyatlarini veritabanindaki guncel katalogdan dogrulama
 
 ## Sonraki Evre
 
-Bu statik prototip, sonraki evrede gercek backend sistemine tasinacak:
+Siradaki ana baglantilar:
 
-- Ilk canli evre icin Hostinger PHP
-- Sonraki evre icin Next.js veya uygun Node.js mimarisi
-- MySQL/MariaDB veritabani
-- Google ile giris
-- Online teklif dosya yukleme ve e-posta bildirimi
-- Admin paneli
-- Magaza, siparis ve sepet backend'i
+- Google Cloud OAuth bilgilerini canli sunucuya ekleme
 - PayTR veya iyzico odeme entegrasyonu
-- Hostinger uzerinde staging/canli yayin
+- Gercek urun gorselleri ve icerikleri
+- SEO, yapilandirilmis veri, sitemap ve robots.txt
+- Test kurulumundan ana domaine kontrollu gecis
 
 ## Dokumanlar
 

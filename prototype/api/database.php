@@ -168,10 +168,173 @@ CREATE TABLE IF NOT EXISTS order_items (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS product_categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(80) NOT NULL UNIQUE,
+    name VARCHAR(160) NOT NULL,
+    description TEXT NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS products (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    category_id BIGINT UNSIGNED NOT NULL,
+    slug VARCHAR(190) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    tag VARCHAR(120) NOT NULL DEFAULT '',
+    summary TEXT NOT NULL,
+    detail TEXT NOT NULL,
+    price_minor BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    currency CHAR(3) NOT NULL DEFAULT 'TRY',
+    visual_type VARCHAR(40) NOT NULL DEFAULT 'plate',
+    image_url TEXT NULL,
+    knowledge_usage TEXT NOT NULL,
+    knowledge_material TEXT NOT NULL,
+    knowledge_faq TEXT NOT NULL,
+    stock_mode VARCHAR(40) NOT NULL DEFAULT 'made_to_order',
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_product_active_sort (is_active, sort_order),
+    CONSTRAINT fk_products_category
+        FOREIGN KEY (category_id) REFERENCES product_categories(id)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS customers (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    google_sub VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(190) NOT NULL UNIQUE,
+    name VARCHAR(190) NOT NULL,
+    avatar_url TEXT NULL,
+    phone VARCHAR(80) NOT NULL DEFAULT '',
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    last_login_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_customer_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS customer_addresses (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    customer_id BIGINT UNSIGNED NOT NULL,
+    label VARCHAR(80) NOT NULL DEFAULT 'Teslimat',
+    recipient_name VARCHAR(190) NOT NULL,
+    phone VARCHAR(80) NOT NULL,
+    city VARCHAR(120) NOT NULL,
+    district VARCHAR(120) NOT NULL,
+    address_line TEXT NOT NULL,
+    postal_code VARCHAR(30) NOT NULL DEFAULT '',
+    is_default TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_address_customer (customer_id),
+    CONSTRAINT fk_addresses_customer
+        FOREIGN KEY (customer_id) REFERENCES customers(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
     ];
 
     foreach ($queries as $query) {
         $pdo->exec($query);
+    }
+
+    kc_add_column_if_missing(
+        $pdo,
+        'quote_requests',
+        'customer_id',
+        'ALTER TABLE quote_requests ADD COLUMN customer_id BIGINT UNSIGNED NULL AFTER id, ADD INDEX idx_quote_customer (customer_id)'
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'customer_id',
+        'ALTER TABLE orders ADD COLUMN customer_id BIGINT UNSIGNED NULL AFTER id, ADD INDEX idx_order_customer (customer_id)'
+    );
+
+    kc_seed_catalog($pdo);
+}
+
+function kc_add_column_if_missing(PDO $pdo, string $table, string $column, string $alterSql): void
+{
+    $statement = $pdo->prepare(
+        'SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name AND COLUMN_NAME = :column_name'
+    );
+    $statement->execute(['table_name' => $table, 'column_name' => $column]);
+    if ((int)$statement->fetchColumn() === 0) {
+        $pdo->exec($alterSql);
+    }
+}
+
+function kc_seed_catalog(PDO $pdo): void
+{
+    $categoryStatement = $pdo->prepare(
+        'INSERT INTO product_categories (code, name, description, sort_order)
+        VALUES (:code, :name, :description, :sort_order)
+        ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description)'
+    );
+    $categories = [
+        ['industrial', 'Endustriyel Parcalar', 'Makine, enerji ve uretim hatlari icin teknik metal parcalar.', 10],
+        ['retail', 'Urunlerimiz', 'Hazir satisa uygun metal urunler.', 20],
+    ];
+    foreach ($categories as [$code, $name, $description, $sortOrder]) {
+        $categoryStatement->execute([
+            'code' => $code,
+            'name' => $name,
+            'description' => $description,
+            'sort_order' => $sortOrder,
+        ]);
+    }
+
+    if ((int)$pdo->query('SELECT COUNT(*) FROM products')->fetchColumn() > 0) {
+        return;
+    }
+
+    $categoryIds = [];
+    foreach ($pdo->query('SELECT id, code FROM product_categories')->fetchAll() as $category) {
+        $categoryIds[$category['code']] = (int)$category['id'];
+    }
+
+    $products = [
+        ['industrial', 'makine-baglanti-plakasi', 'Makine Baglanti Plakasi', 'Endustriyel', 148000, 'plate', 'Lazer kesim ve hassas delik toleransi ile montaja hazir baglanti plakasi.', 'Makine govdeleri, konveyor sistemleri ve uretim hatlarinda kullanilabilecek cok amacli metal baglanti parcasi.'],
+        ['industrial', 'disli-flans', 'Disli Flans Parca', 'Endustriyel', 235000, 'ring', 'Kalip, makine ve aktarim sistemleri icin yuvarlak kesim flans parcasi.', 'Celik, paslanmaz veya aluminyum malzeme secenekleriyle uretime uygun teknik flans altyapisi.'],
+        ['industrial', 'gunes-paneli-ayagi', 'Gunes Paneli Ayagi', 'Enerji', 89000, 'bracket', 'Gunes enerji sistemleri icin bukumlu ve delikli montaj ayagi.', 'Saha montajinda hiz, dayaniklilik ve olculu kurulum gerektiren panel tasiyici parcasi.'],
+        ['industrial', 'metal-kablo-kanali', 'Metal Kablo Kanali', 'Tesisat', 76000, 'rail', 'Endustriyel tesisat ve pano hatlari icin bukumlu kablo tasima kanali.', 'Elektrik ve otomasyon projelerinde kablo gecislerini duzenli tutmak icin tasarlandi.'],
+        ['retail', 'dekoratif-metal-raf', 'Dekoratif Metal Raf', 'Urun', 125000, 'bracket', 'Minimal ic mekanlar icin lazer kesim metal raf ve tasiyici set.', 'Magaza, ofis ve ev kullanimi icin sade gorunumlu, dayanikli metal raf urunu.'],
+        ['retail', 'bahce-paneli', 'Lazer Kesim Bahce Paneli', 'Urun', 315000, 'plate', 'Dis mekanlarda dekoratif bolme veya cephe etkisi icin metal panel.', 'Desenli panel altyapisi ileride gercek modeller, olculer ve kaplama secenekleriyle doldurulabilir.'],
+        ['retail', 'masa-ayagi-seti', 'Metal Masa Ayagi Seti', 'Urun', 198000, 'rail', 'Ahsap veya kompozit tablalar icin sabit fiyatli metal masa ayagi.', 'Lazer kesim ve bukumle uretilen masa ayagi setleri icin satin alma sayfasi ornegi.'],
+        ['retail', 'duvar-logo-panelleri', 'Duvar Logo Paneli', 'Urun', 225000, 'plate', 'Isletmeler icin metal logo, tabela veya dekoratif duvar paneli.', 'Marka uygulamalarinda kullanilabilecek lazer kesim dekoratif metal panel altyapisi.'],
+    ];
+    $insert = $pdo->prepare(
+        'INSERT INTO products
+        (category_id, slug, name, tag, summary, detail, price_minor, visual_type, knowledge_usage, knowledge_material, knowledge_faq, sort_order)
+        VALUES (:category_id, :slug, :name, :tag, :summary, :detail, :price_minor, :visual_type, :usage, :material, :faq, :sort_order)'
+    );
+    foreach ($products as $index => [$group, $slug, $name, $tag, $price, $type, $summary, $detail]) {
+        $insert->execute([
+            'category_id' => $categoryIds[$group],
+            'slug' => $slug,
+            'name' => $name,
+            'tag' => $tag,
+            'summary' => $summary,
+            'detail' => $detail,
+            'price_minor' => $price,
+            'visual_type' => $type,
+            'usage' => 'Bu urunun kullanildigi sektorler ve montaj senaryolari burada anlatilabilir.',
+            'material' => 'Malzeme, kalinlik, yuzey islemi ve tolerans bilgileri burada tutulabilir.',
+            'faq' => 'Urune ozel sik sorulan sorular ve net cevaplar burada yayinlanabilir.',
+            'sort_order' => ($index + 1) * 10,
+        ]);
     }
 }
 
@@ -188,10 +351,11 @@ function kc_db_store_quote(array $config, array $metadata): bool
         $project = (array)$metadata['project'];
         $statement = $pdo->prepare(
             'INSERT INTO quote_requests
-            (request_code, name, company, phone, email, city, material, thickness, quantity, message)
-            VALUES (:code, :name, :company, :phone, :email, :city, :material, :thickness, :quantity, :message)'
+            (customer_id, request_code, name, company, phone, email, city, material, thickness, quantity, message)
+            VALUES (:customer_id, :code, :name, :company, :phone, :email, :city, :material, :thickness, :quantity, :message)'
         );
         $statement->execute([
+            'customer_id' => $metadata['customer_id'] ?? null,
             'code' => $metadata['request_id'],
             'name' => $customer['name'],
             'company' => $customer['company'],
@@ -269,10 +433,11 @@ function kc_db_store_order(array $config, array $metadata): bool
         $customer = (array)$metadata['customer'];
         $statement = $pdo->prepare(
             'INSERT INTO orders
-            (order_code, payment_status, name, phone, email, address, total_text)
-            VALUES (:code, :payment_status, :name, :phone, :email, :address, :total)'
+            (customer_id, order_code, payment_status, name, phone, email, address, total_text)
+            VALUES (:customer_id, :code, :payment_status, :name, :phone, :email, :address, :total)'
         );
         $statement->execute([
+            'customer_id' => $metadata['customer_id'] ?? null,
             'code' => $metadata['request_id'],
             'payment_status' => $metadata['payment_status'],
             'name' => $customer['name'],
@@ -308,6 +473,74 @@ function kc_db_store_order(array $config, array $metadata): bool
         error_log('Order database save error: ' . $error->getMessage());
         return false;
     }
+}
+
+function kc_db_resolve_order_items(array $config, array $submittedItems): array
+{
+    if ($submittedItems === [] || count($submittedItems) > 50) {
+        throw new InvalidArgumentException('Sepet gecersiz.');
+    }
+
+    $quantities = [];
+    foreach ($submittedItems as $item) {
+        $reference = trim((string)($item['id'] ?? ''));
+        $quantity = (int)($item['qty'] ?? 0);
+        if (!preg_match('/^[a-z0-9-]{3,190}$/', $reference) || $quantity < 1 || $quantity > 1000) {
+            throw new InvalidArgumentException('Sepette gecersiz bir urun veya adet var.');
+        }
+        $quantities[$reference] = min(1000, ($quantities[$reference] ?? 0) + $quantity);
+    }
+
+    $pdo = kc_db_required($config);
+    kc_install_schema($pdo);
+    $references = array_keys($quantities);
+    $placeholders = implode(',', array_fill(0, count($references), '?'));
+    $statement = $pdo->prepare(
+        "SELECT p.slug, p.name, p.price_minor, p.currency
+        FROM products p
+        INNER JOIN product_categories c ON c.id = p.category_id
+        WHERE p.slug IN ({$placeholders}) AND p.is_active = 1 AND c.is_active = 1"
+    );
+    $statement->execute($references);
+
+    $catalog = [];
+    foreach ($statement->fetchAll() as $product) {
+        $catalog[$product['slug']] = $product;
+    }
+    if (count($catalog) !== count($references)) {
+        throw new InvalidArgumentException('Sepette artik satista olmayan bir urun var. Sepeti yenileyip tekrar deneyin.');
+    }
+
+    $resolvedItems = [];
+    $totalMinor = 0;
+    foreach ($references as $reference) {
+        $product = $catalog[$reference];
+        if ($product['currency'] !== 'TRY') {
+            throw new RuntimeException('Desteklenmeyen urun para birimi.');
+        }
+        $quantity = $quantities[$reference];
+        $priceMinor = (int)$product['price_minor'];
+        $totalMinor += $priceMinor * $quantity;
+        $resolvedItems[] = [
+            'id' => $reference,
+            'name' => $product['name'],
+            'qty' => $quantity,
+            'price' => kc_format_try($priceMinor),
+            'price_minor' => $priceMinor,
+        ];
+    }
+
+    return [
+        'items' => $resolvedItems,
+        'total' => kc_format_try($totalMinor),
+        'total_minor' => $totalMinor,
+        'currency' => 'TRY',
+    ];
+}
+
+function kc_format_try(int $amountMinor): string
+{
+    return number_format($amountMinor / 100, 2, ',', '.') . ' TL';
 }
 
 function kc_db_set_mail_status(array $config, string $table, string $codeColumn, string $code, bool $sent): void

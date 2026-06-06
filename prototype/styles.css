@@ -976,6 +976,25 @@ details p {
   transform: rotate(4deg);
 }
 
+.product-media.has-image::before,
+.product-media.has-image::after {
+  display: none;
+}
+
+.product-media.has-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  display: block;
+  object-fit: contain;
+  padding: 18px;
+  background: #fff;
+}
+
+.product-stage .product-media.has-image img {
+  min-height: 480px;
+}
+
 .product-body {
   padding: 18px;
 }
@@ -1192,6 +1211,8 @@ details p {
 }
 
 .google-button {
+  display: grid;
+  place-items: center;
   min-height: 52px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1200,9 +1221,180 @@ details p {
   font-weight: 850;
 }
 
+.google-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .profile-dashboard {
   display: grid;
   gap: 18px;
+}
+
+.profile-loading,
+.account-empty {
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.profile-account {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.profile-account img,
+.profile-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+}
+
+.profile-account img {
+  object-fit: cover;
+}
+
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  background: var(--dark);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 850;
+}
+
+.profile-account h2,
+.profile-account p {
+  margin: 0;
+}
+
+.profile-account p {
+  margin-top: 4px;
+}
+
+.account-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.account-stat-grid > div {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.account-stat-grid strong,
+.account-stat-grid span {
+  display: block;
+}
+
+.account-stat-grid strong {
+  margin-bottom: 6px;
+  font-size: 28px;
+}
+
+.account-stat-grid span {
+  color: var(--muted);
+}
+
+.account-section {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  overflow: hidden;
+}
+
+.account-heading {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-heading h3 {
+  margin: 0;
+}
+
+.address-list,
+.account-records {
+  display: grid;
+}
+
+.address-list article,
+.account-records > div {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.address-list article:last-child,
+.account-records > div:last-child {
+  border-bottom: 0;
+}
+
+.address-list p {
+  margin: 5px 0 0;
+}
+
+.account-records > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.account-records span:last-child {
+  text-align: right;
+}
+
+.account-records strong,
+.account-records b,
+.account-records small {
+  display: block;
+}
+
+.account-records small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.address-create {
+  margin: 14px;
+  box-shadow: none;
+}
+
+.account-form {
+  padding: 0 18px 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.account-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 750;
+}
+
+.account-form input,
+.account-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
 }
 
 .profile-row {
@@ -1717,8 +1909,15 @@ details p {
   .product-grid,
   .knowledge-columns,
   .admin-strip,
+  .account-stat-grid,
+  .account-form-grid,
   .map-panel {
     grid-template-columns: 1fr;
+  }
+
+  .profile-account {
+    grid-template-columns: 1fr;
+    justify-items: start;
   }
 
   .quote-form,

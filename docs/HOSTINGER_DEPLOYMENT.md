@@ -40,6 +40,8 @@ index.html
 styles.css
 app.js
 api/
+account/
+admin/
 ```
 
 Preview PNG dosyalari canli site icin sart degildir; GitHub dokumantasyonu icin tutulabilir.
@@ -62,16 +64,26 @@ olarak kaydedilebilir.
 
 `config.php` GitHub'a yuklenmemelidir.
 
-Ornek notification email listesi:
+Canli bildirim adresi:
 
 ```php
 'notification_emails' => [
     'info@karadagcelik.com',
-    'sirket-gmail-adresi@example.com',
 ],
 ```
 
-Gerekirse test asamasinda kisisel test e-posta adresi de yalnizca sunucudaki `config.php` dosyasina eklenebilir. Bu adresler GitHub'a yuklenmemelidir.
+`api/database.local.php` canli MySQL parolasini tasir. Guncelleme paketleri bu
+dosyayi icermemeli ve sunucudaki dosya silinmemelidir.
+
+Google girisi icin `api/config.php` icindeki `google` alanlari yalnizca canli
+sunucuda doldurulur. Test geri donus adresi:
+
+```text
+https://karadagcelik.com/kc-test/account/google-callback.php
+```
+
+Google client secret, veritabani parolasi ve yonetici parolasi GitHub'a
+yuklenmemelidir.
 
 ## WordPress'i Hemen Silme
 
@@ -123,5 +135,23 @@ Yonetim panelinde:
 - Magaza siparis talepleri ve urun kalemleri
 - Iletisim mesajlari
 - Kayit durumlari
+- Magaza urunleri ve fiyatlari
+- Musteri hesaplari
 
 goruntulenebilir.
+
+## Guncelleme Paketi
+
+Test sitesine guncelleme yaparken paket icerigi `public_html/kc-test/` icine
+yuklenir ve ayni adli dosyalarin uzerine yazilir. Su gizli canli dosya korunur:
+
+```text
+public_html/kc-test/api/database.local.php
+```
+
+Yuklemeden sonra:
+
+1. `admin/index.php` acilarak yeni tablolarin otomatik kurulmasi saglanir.
+2. `api/products.php` adresinde JSON urun listesi kontrol edilir.
+3. Yonetim panelinde `Urunler` ve `Musteriler` bolumleri kontrol edilir.
+4. Magaza, teklif, iletisim ve siparis formlari test edilir.

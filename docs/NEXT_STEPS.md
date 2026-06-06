@@ -1,83 +1,29 @@
 # Sonraki Adimlar
 
-## 1. Tasarim Geri Bildirimi
+## Tamamlanan Altyapi
 
-Kullanici prototipi acip su basliklarda geri bildirim verir:
+- PHP/MySQL backend
+- Teklif, iletisim ve siparis e-posta akislari
+- Guvenli dosya yukleme
+- Yonetim paneli
+- Urun katalog yonetimi
+- Musteri, adres ve hesap veri modeli
+- Google OAuth kod altyapisi
+- Veritabanindan urun listeleme
+- Sunucu tarafli siparis fiyat dogrulamasi
 
-- Ana iki kapi ekrani
-- Online teklif sayfasi
-- Magaza sayfasi
-- Urun kartlari
-- Urun detay sayfasi
-- Sepet paneli
-- Profil ve iletisim sayfalari
-- Mobil gorunum
+## Siradaki Adimlar
 
-## 2. Hostinger Teknik Kontrol
+1. Guncel katalog ve hesap paketini `/kc-test/` kurulumuna yukle.
+2. Google Cloud OAuth istemcisi olustur ve gizli bilgileri canli config'e ekle.
+3. Google giris, adres, teklif ve siparis gecmisini test et.
+4. Gercek urunleri, fiyatlari, gorselleri ve bilgi metinlerini yonetim panelinden gir.
+5. PayTR veya iyzico test entegrasyonunu bagla.
+6. Odeme callback ve siparis durum akisini tamamla.
+7. SEO metadata, schema.org, sitemap ve robots.txt ekle.
+8. Test kurulumu onaylandiktan sonra ana domaine gec.
 
-Kodlamaya gercek backend olarak gecmeden once Hostinger'da sunlar kontrol edilir:
-
-- Node.js kurulum ekrani
-- Startup file ayarlari
-- Build command / install command alanlari
-- Environment variables alani
-- MySQL/MariaDB baglanti bilgileri
-- SSL ve DNS durumu
-- Backup durumu
-
-## 3. Mimari Secim
-
-Muhtemel hedef mimari:
-
-- Next.js
-- Node.js backend/API routes
-- MySQL/MariaDB
-- Google OAuth
-- PayTR odeme entegrasyonu
-- SMTP/transactional mail
-- Admin panel
-
-## 4. Veritabani Taslagi
-
-Ilk tablolar:
-
-- users
-- addresses
-- products
-- product_categories
-- cart_items veya orders
-- orders
-- order_items
-- quote_requests
-- quote_request_files
-- admin_users
-
-## 5. Gercek Online Teklif Akisi
-
-Yapilacaklar:
-
-- Dosya turu sinirlama
-- Dosya boyutu limiti
-- Guvenli dosya storage
-- Form validasyonu
-- Mustreriye otomatik mail
-- info@karadagcelik.com adresine bildirim
-- Admin panelde teklif talebi goruntuleme
-
-## 6. Magaza ve Odeme
-
-Yapilacaklar:
-
-- Urunleri veritabanindan cekme
-- Sepet backend'i
-- Siparis olusturma
-- PayTR test entegrasyonu
-- Odeme sonucu callback
-- Siparis durum takibi
-
-## 7. Canliya Alma
-
-Yapilacaklar:
+## Canliya Gecis Kontrolu
 
 - Staging yayin
 - Test odeme
