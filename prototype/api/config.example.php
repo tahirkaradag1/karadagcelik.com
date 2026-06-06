@@ -12,7 +12,7 @@ return [
     ],
     // Store uploads outside public_html when possible.
     // If this path is not writable, api/common.php falls back to a local private_uploads folder.
-    'upload_dir' => dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',
+    'upload_dir' => dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',
     'max_file_bytes' => 25 * 1024 * 1024,
     'allowed_extensions' => [
         'dxf', 'dwg', 'pdf', 'step', 'stp', 'iges', 'igs', 'zip', 'rar', 'jpg', 'jpeg', 'png',

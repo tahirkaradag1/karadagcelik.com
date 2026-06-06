@@ -10,7 +10,7 @@ function kc_config(): array
         'from_name' => 'Karadag Celik',
         'reply_to' => 'info@karadagcelik.com',
         'notification_emails' => ['info@karadagcelik.com'],
-        'upload_dir' => dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',
+        'upload_dir' => dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',
         'max_file_bytes' => 25 * 1024 * 1024,
         'allowed_extensions' => ['dxf', 'dwg', 'pdf', 'step', 'stp', 'iges', 'igs', 'zip', 'rar', 'jpg', 'jpeg', 'png'],
     ];
