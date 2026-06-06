@@ -1,0 +1,22 @@
+.env
+.env.*
+*.local
+*.log
+node_modules/
+dist/
+build/
+.next/
+.vercel/
+.turbo/
+.cache/
+.DS_Store
+Thumbs.db
+
+# Local Codex/app state
+.codex/
+.agents/
+auth.json
+
+# Local-only generated workspace artifacts
+work/
+outputs/

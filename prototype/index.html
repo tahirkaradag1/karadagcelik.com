@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Karadağ Çelik | Online Teklif ve Mağaza</title>
+    <meta
+      name="description"
+      content="Karadağ Çelik için online lazer kesim teklifi, endüstriyel parça mağazası ve premium web deneyimi MVP prototipi."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="icon-home" viewBox="0 0 24 24">
+        <path d="m3 11 9-8 9 8" />
+        <path d="M5 10v10h5v-6h4v6h5V10" />
+      </symbol>
+      <symbol id="icon-store" viewBox="0 0 24 24">
+        <path d="M4 10h16" />
+        <path d="M5 10l1-6h12l1 6" />
+        <path d="M6 10v10h12V10" />
+        <path d="M9 20v-6h6v6" />
+      </symbol>
+      <symbol id="icon-phone" viewBox="0 0 24 24">
+        <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z" />
+      </symbol>
+      <symbol id="icon-user" viewBox="0 0 24 24">
+        <path d="M20 21a8 8 0 0 0-16 0" />
+        <circle cx="12" cy="7" r="4" />
+      </symbol>
+      <symbol id="icon-cart" viewBox="0 0 24 24">
+        <circle cx="9" cy="21" r="1" />
+        <circle cx="20" cy="21" r="1" />
+        <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 6H6" />
+      </symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <path d="m17 8-5-5-5 5" />
+        <path d="M12 3v12" />
+      </symbol>
+      <symbol id="icon-file" viewBox="0 0 24 24">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+        <path d="M14 2v6h6" />
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+        <path d="M12 5v14" />
+      </symbol>
+      <symbol id="icon-minus" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+      </symbol>
+      <symbol id="icon-x" viewBox="0 0 24 24">
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24">
+        <path d="M3 6h18" />
+        <path d="M8 6V4h8v2" />
+        <path d="M19 6l-1 14H6L5 6" />
+      </symbol>
+      <symbol id="icon-credit" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M2 10h20" />
+      </symbol>
+      <symbol id="icon-message" viewBox="0 0 24 24">
+        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
+      </symbol>
+      <symbol id="icon-map" viewBox="0 0 24 24">
+        <path d="M12 21s7-5.2 7-12A7 7 0 1 0 5 9c0 6.8 7 12 7 12Z" />
+        <circle cx="12" cy="9" r="2" />
+      </symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+      </symbol>
+      <symbol id="icon-package" viewBox="0 0 24 24">
+        <path d="m21 8-9-5-9 5 9 5 9-5Z" />
+        <path d="M3 8v8l9 5 9-5V8" />
+        <path d="M12 13v8" />
+      </symbol>
+    </svg>
+
+    <main class="site-shell">
+      <section class="gate-screen view active" id="gate" data-view="gate">
+        <div class="gate-top">
+          <div class="brand-lockup" aria-label="Karadağ Çelik">
+            <span class="brand-mark">KC</span>
+            <span>
+              <strong>Karadağ Çelik</strong>
+              <small>Mersin merkezli lazer kesim ve abkant büküm</small>
+            </span>
+          </div>
+          <p>Teklif talebi ve hazır parça mağazası için iki net giriş.</p>
+        </div>
+
+        <div class="gate-grid" aria-label="Site giriş kapıları">
+          <button class="gate-card quote-gate" type="button" data-target-view="quote">
+            <span class="gate-kicker">1. Kapı</span>
+            <span class="gate-title">Online Teklif Oluştur</span>
+            <span class="gate-copy">
+              CAD dosyanızı yükleyin, proje notunuzu ekleyin, ekibimiz incelesin ve size manuel teklif dönsün.
+            </span>
+            <span class="gate-visual laser-visual" aria-hidden="true">
+              <span class="laser-head"></span>
+              <span class="beam"></span>
+              <span class="sheet sheet-a"></span>
+              <span class="sheet sheet-b"></span>
+              <span class="spark spark-1"></span>
+              <span class="spark spark-2"></span>
+              <span class="spark spark-3"></span>
+              <span class="spark spark-4"></span>
+            </span>
+            <span class="gate-action">
+              Teklif odasına gir
+              <svg><use href="#icon-arrow" /></svg>
+            </span>
+          </button>
+
+          <button class="gate-card store-gate" type="button" data-target-view="store">
+            <span class="gate-kicker">2. Kapı</span>
+            <span class="gate-title">Mağazayı Keşfet</span>
+            <span class="gate-copy">
+              Endüstriyel parçalar ve satın alınabilir metal ürünler için temiz, hızlı ve premium alışveriş alanı.
+            </span>
+            <span class="gate-visual parts-visual" aria-hidden="true">
+              <span class="part plate"></span>
+              <span class="part ring"></span>
+              <span class="part bracket"></span>
+              <span class="part rail"></span>
+            </span>
+            <span class="gate-action">
+              Mağaza odasına gir
+              <svg><use href="#icon-arrow" /></svg>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <section class="view quote-view" id="quote" data-view="quote">
+        <div class="section-band quote-hero">
+          <div class="section-inner quote-layout">
+            <div class="quote-intro">
+              <span class="eyebrow">Manuel uzman incelemesi</span>
+              <h1>Dosyanızı yükleyin, lazer kesim teklifinizi ekibimiz hazırlasın.</h1>
+              <p>
+                Teknik çizim, CAD dosyası veya proje notlarınızı iletin. Talebiniz kayda alınır, dosyanız incelenir ve
+                fiyatlandırma için size geri dönülür.
+              </p>
+              <div class="trust-row" aria-label="Guven unsurlari">
+                <span><svg><use href="#icon-shield" /></svg> Güvenli dosya yükleme</span>
+                <span><svg><use href="#icon-package" /></svg> Türkiye geneli teslimat</span>
+              </div>
+            </div>
+
+            <form class="quote-form tool-panel" id="quoteForm">
+              <div class="form-head">
+                <h2>Online Teklif Formu</h2>
+                <p>Talebiniz info@karadagcelik.com üzerinden takip edilir.</p>
+              </div>
+              <label>
+                Ad soyad
+                <input name="name" autocomplete="name" required placeholder="Adınız ve soyadınız" />
+              </label>
+              <label>
+                Firma adı
+                <input name="company" autocomplete="organization" placeholder="Opsiyonel" />
+              </label>
+              <div class="split-fields">
+                <label>
+                  Telefon
+                  <input name="phone" autocomplete="tel" required placeholder="+90 5.." />
+                </label>
+                <label>
+                  E-posta
+                  <input name="email" type="email" autocomplete="email" required placeholder="ornek@firma.com" />
+                </label>
+              </div>
+              <div class="split-fields three">
+                <label>
+                  Malzeme
+                  <select name="material">
+                    <option value="">Belirtmedim</option>
+                    <option>Siyah sac</option>
+                    <option>Paslanmaz</option>
+                    <option>Alüminyum</option>
+                    <option>Galvaniz</option>
+                  </select>
+                </label>
+                <label>
+                  Kalınlık
+                  <input name="thickness" placeholder="Orn. 3 mm" />
+                </label>
+                <label>
+                  Adet
+                  <input name="quantity" type="number" min="1" placeholder="Orn. 50" />
+                </label>
+              </div>
+              <label>
+                Proje notu
+                <textarea name="message" rows="4" placeholder="Termin, teslimat, büküm veya özel detaylar"></textarea>
+              </label>
+              <label class="upload-box" for="quoteFiles">
+                <input id="quoteFiles" name="files" type="file" multiple accept=".dxf,.dwg,.pdf,.step,.stp,.iges,.igs,.zip,.rar,.jpg,.jpeg,.png" />
+                <svg><use href="#icon-upload" /></svg>
+                <span>DXF, DWG, PDF, STEP, ZIP veya görsel yükleyin</span>
+                <small id="fileSummary">Dosya seçilmedi</small>
+              </label>
+              <label class="checkline">
+                <input type="checkbox" required />
+                <span>KVKK ve teklif süreci bilgilendirmesini kabul ediyorum.</span>
+              </label>
+              <button class="primary-action" type="submit">Teklif talebini gönder</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="section-band">
+          <div class="section-inner">
+            <div class="section-heading">
+              <span class="eyebrow">Süreç</span>
+              <h2>Dosyadan teslimata kadar net bir akış.</h2>
+            </div>
+            <div class="process-grid">
+              <article class="process-item">
+                <span>01</span>
+                <h3>Dosyanı Yükle</h3>
+                <p>Teknik çiziminizi, CAD dosyanızı veya parça detaylarınızı güvenli altyapıya yükleyin.</p>
+              </article>
+              <article class="process-item">
+                <span>02</span>
+                <h3>Uzman Teklif</h3>
+                <p>Proje dosyanız incelenir; malzeme, kalınlık, adet ve termin detaylarıyla manuel fiyatlandırılır.</p>
+              </article>
+              <article class="process-item">
+                <span>03</span>
+                <h3>Kusursuz Üretim</h3>
+                <p>Onaylanan işler lazer kesim ve abkant büküm parkurunda hassas toleransla üretilir.</p>
+              </article>
+              <article class="process-item">
+                <span>04</span>
+                <h3>Kapıya Teslimat</h3>
+                <p>Parçalar endüstriyel paketleme ile sevke hazırlanır ve adresinize gönderilir.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-band knowledge-band">
+          <div class="section-inner knowledge-layout">
+            <div class="section-heading">
+              <span class="eyebrow">Bilgi merkezi</span>
+              <h2>Online lazer kesim teklifi arayanlar için kaynak alan.</h2>
+              <p>
+                Bu bölüm, teklif süreci hakkında merak edilenleri cevaplayan ve arama motorlarının anlayabileceği
+                detaylı içerik yapısı için hazırlandı.
+              </p>
+            </div>
+            <div class="knowledge-list">
+              <details open>
+                <summary>Lazer kesim teklifi için hangi dosyalar uygundur?</summary>
+                <p>DXF ve DWG teknik çizimler en sağlıklı başlangıçtır. PDF, STEP, STP ve ZIP dosyaları da proje detayına göre incelenebilir.</p>
+              </details>
+              <details>
+                <summary>Fiyat neden dosya incelendikten sonra verilir?</summary>
+                <p>Kesim yolu, malzeme türü, kalınlık, adet, fire ve büküm ihtiyacı maliyeti değiştirir. Manuel inceleme daha doğru fiyatlandırma sağlar.</p>
+              </details>
+              <details>
+                <summary>Teklif onayından sonra süreç nasıl ilerler?</summary>
+                <p>Onaylanan iş planlanır, üretime alınır, kalite kontrol sonrası paketlenir ve teslimat süreci başlatılır.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view store-view" id="store" data-view="store">
+        <div class="section-band store-hero">
+          <div class="section-inner store-layout">
+            <div class="store-copy">
+              <span class="eyebrow">Mağaza</span>
+              <h1>Hazır satın alma için iki tezgah: endüstriyel parçalar ve ürünler.</h1>
+              <p>
+                Sabit fiyatlı ürünlerde teklif beklemeden sepet oluşturun. Her ürün sayfası, satın alma alanının
+                altında detaylı bilgi yapısına hazır şekilde tasarlandı.
+              </p>
+            </div>
+            <div class="showcase-visual" aria-hidden="true">
+              <span class="showcase-card one"></span>
+              <span class="showcase-card two"></span>
+              <span class="showcase-card three"></span>
+              <span class="showcase-base"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-band white-band">
+          <div class="section-inner">
+            <div class="category-intro">
+              <span class="eyebrow">Endüstriyel Parçalar</span>
+              <h2>Makine, enerji ve üretim hatları için lazer kesim parçalar.</h2>
+              <p>
+                Endüstriyel parçalar bölümü, stoklu veya siparişle üretilen teknik metal parçalar için düşünüldü.
+                Kartlar ileride gerçek ürün görselleri ve teknik verilerle doldurulabilir.
+              </p>
+            </div>
+            <div class="product-grid" id="industrialProducts"></div>
+          </div>
+        </div>
+
+        <div class="section-band">
+          <div class="section-inner">
+            <div class="category-intro">
+              <span class="eyebrow">Ürünlerimiz</span>
+              <h2>Hazır satışa uygun metal ürünler.</h2>
+              <p>
+                Bu alan, sabit fiyatlı raf, panel, ayak, dekoratif veya montaja hazır ürünleri sergilemek için
+                hazırlandı.
+              </p>
+            </div>
+            <div class="product-grid" id="retailProducts"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view product-view" id="product" data-view="product">
+        <div class="section-band product-detail-band">
+          <div class="section-inner product-detail" id="productDetail"></div>
+        </div>
+      </section>
+
+      <section class="view contact-view" id="contact" data-view="contact">
+        <div class="section-band">
+          <div class="section-inner contact-layout">
+            <div class="contact-copy">
+              <span class="eyebrow">İletişim</span>
+              <h1>Karadağ Çelik ile projenizi konuşalım.</h1>
+              <p>
+                Teklif, üretim kapasitesi, teslimat ve mağazadaki siparişler için e-posta, WhatsApp veya harita
+                üzerinden bize ulaşın.
+              </p>
+              <div class="contact-actions">
+                <a class="primary-action link-action" href="https://wa.me/905000000000" target="_blank" rel="noreferrer">
+                  WhatsApp'a git
+                </a>
+                <a class="secondary-action" href="mailto:info@karadagcelik.com">info@karadagcelik.com</a>
+              </div>
+            </div>
+            <form class="contact-form tool-panel" id="contactForm">
+              <h2>E-posta Gönder</h2>
+              <label>
+                Ad soyad
+                <input required placeholder="Adınız ve soyadınız" />
+              </label>
+              <label>
+                E-posta
+                <input required type="email" placeholder="ornek@firma.com" />
+              </label>
+              <label>
+                Mesaj
+                <textarea required rows="5" placeholder="Bize nasıl yardımcı olabiliriz?"></textarea>
+              </label>
+              <button class="primary-action" type="submit">Mesajı gönder</button>
+            </form>
+            <div class="map-panel">
+              <div class="map-surface" aria-hidden="true">
+                <span class="road r1"></span>
+                <span class="road r2"></span>
+                <span class="road r3"></span>
+                <span class="pin"><svg><use href="#icon-map" /></svg></span>
+              </div>
+              <div>
+                <h2>Mersin, Türkiye</h2>
+                <p>Net fabrika adresi eklendiğinde Google Maps yerleşimi bu alana bağlanacak.</p>
+                <a class="secondary-action" href="https://www.google.com/maps/search/Karada%C4%9F+%C3%87elik+Mersin" target="_blank" rel="noreferrer">
+                  Google Haritalar'da aç
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view profile-view" id="profile" data-view="profile">
+        <div class="section-band">
+          <div class="section-inner profile-layout">
+            <div class="profile-copy">
+              <span class="eyebrow">Hesabim</span>
+              <h1>Google ile giriş, sipariş ve teklif takibi.</h1>
+              <p>
+                Müşteri hesabı; adresler, aktif siparişler, geçmiş siparişler ve online teklif talepleri için tek
+                merkez olarak tasarlandi.
+              </p>
+            </div>
+            <div class="profile-panel tool-panel" id="profilePanel"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="dock" id="dock" aria-label="Site gezinme">
+      <button class="dock-button" type="button" data-nav-view="gate" aria-label="Ana sayfa" data-tooltip="Ana sayfa">
+        <svg><use href="#icon-home" /></svg>
+      </button>
+      <button class="dock-button" type="button" data-nav-view="store" aria-label="Mağaza" data-tooltip="Mağaza">
+        <svg><use href="#icon-store" /></svg>
+      </button>
+      <button class="dock-button" type="button" data-nav-view="contact" aria-label="İletişim" data-tooltip="İletişim">
+        <svg><use href="#icon-phone" /></svg>
+      </button>
+      <button class="dock-quote" type="button" data-nav-view="quote">Online Teklif Oluştur</button>
+      <button class="dock-button" type="button" data-nav-view="profile" aria-label="Profil" data-tooltip="Profil">
+        <svg><use href="#icon-user" /></svg>
+      </button>
+      <button class="dock-button cart-trigger" id="cartTrigger" type="button" aria-label="Sepet" data-tooltip="Sepet">
+        <svg><use href="#icon-cart" /></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </nav>
+
+    <div class="drawer-scrim" id="drawerScrim"></div>
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Sepet paneli" aria-hidden="true">
+      <div class="drawer-head">
+        <div>
+          <span class="eyebrow">Sepet</span>
+          <h2>Alışveriş özeti</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeCart" aria-label="Sepeti kapat">
+          <svg><use href="#icon-x" /></svg>
+        </button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-summary">
+        <div>
+          <span>Ara toplam</span>
+          <strong id="cartTotal">0 TL</strong>
+        </div>
+        <button class="primary-action full" type="button" id="checkoutButton">
+          <svg><use href="#icon-credit" /></svg>
+          Ödeme adımına geç
+        </button>
+      </div>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
