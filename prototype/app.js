@@ -86,6 +86,7 @@ const state = {
   cart: JSON.parse(localStorage.getItem("kc_cart") || "[]"),
   activeProductId: products[0].id,
   detailQty: 1,
+  checkoutOpen: false,
 };
 
 const views = [...document.querySelectorAll(".view")];
@@ -110,6 +111,22 @@ function showToast(message) {
   toast.textContent = message;
   toast.classList.remove("visible");
   window.requestAnimationFrame(() => toast.classList.add("visible"));
+}
+
+function isLocalPreview() {
+  return window.location.protocol === "file:";
+}
+
+async function postForm(endpoint, formData) {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    body: formData,
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.ok === false) {
+    throw new Error(payload.message || "İşlem tamamlanamadı.");
+  }
+  return payload;
 }
 
 function setHash(view, productId) {
@@ -273,8 +290,63 @@ function updateCartLine(productId, delta) {
 
 function removeCartLine(productId) {
   state.cart = state.cart.filter((item) => item.id !== productId);
+  if (!state.cart.length) {
+    state.checkoutOpen = false;
+  }
   saveCart();
   renderCart();
+}
+
+function calculateCartTotal() {
+  return state.cart.reduce((total, line) => {
+    const product = products.find((item) => item.id === line.id);
+    return product ? total + product.price * line.qty : total;
+  }, 0);
+}
+
+function cartOrderItems() {
+  return state.cart
+    .map((line) => {
+      const product = products.find((item) => item.id === line.id);
+      if (!product) return null;
+      return {
+        id: product.id,
+        name: product.name,
+        qty: line.qty,
+        price: formatPrice(product.price),
+        rawPrice: product.price,
+      };
+    })
+    .filter(Boolean);
+}
+
+function checkoutFormHtml() {
+  return `
+    <form class="checkout-form" id="orderForm">
+      <div>
+        <span class="eyebrow">Sipariş bilgileri</span>
+        <h3>Mağaza sipariş talebi</h3>
+        <p>Canlı ödeme bağlanana kadar bu form sipariş talebini ekibe iletir.</p>
+      </div>
+      <label>
+        Ad soyad
+        <input name="name" required autocomplete="name" placeholder="Adınız ve soyadınız" />
+      </label>
+      <label>
+        Telefon
+        <input name="phone" required autocomplete="tel" placeholder="+90 5.." />
+      </label>
+      <label>
+        E-posta
+        <input name="email" required type="email" autocomplete="email" placeholder="ornek@firma.com" />
+      </label>
+      <label>
+        Teslimat adresi
+        <textarea name="address" required rows="3" placeholder="İl, ilçe, açık adres"></textarea>
+      </label>
+      <button class="primary-action full" type="submit">Sipariş talebini gönder</button>
+    </form>
+  `;
 }
 
 function renderCart() {
@@ -282,6 +354,8 @@ function renderCart() {
   if (!state.cart.length) {
     cartItems.innerHTML = `<div class="cart-empty"><p>Sepetiniz şu an boş.</p></div>`;
     cartTotal.textContent = formatPrice(0);
+    document.getElementById("checkoutButton").disabled = false;
+    document.getElementById("checkoutButton").innerHTML = `<svg><use href="#icon-credit" /></svg> Ödeme adımına geç`;
     return;
   }
 
@@ -316,7 +390,17 @@ function renderCart() {
       `;
     })
     .join("");
+
+  if (state.checkoutOpen) {
+    cartItems.insertAdjacentHTML("beforeend", checkoutFormHtml());
+  }
+
   cartTotal.textContent = formatPrice(total);
+  const checkoutButton = document.getElementById("checkoutButton");
+  checkoutButton.disabled = state.checkoutOpen;
+  checkoutButton.innerHTML = state.checkoutOpen
+    ? `<svg><use href="#icon-credit" /></svg> Formu doldurun`
+    : `<svg><use href="#icon-credit" /></svg> Ödeme adımına geç`;
 }
 
 function openCart() {
@@ -453,7 +537,12 @@ function bindEvents() {
       showToast("Ödeme için önce sepete ürün ekleyin.");
       return;
     }
-    showToast("PayTR ödeme akışı sonraki evrede canlı API ile bağlanacak.");
+    state.checkoutOpen = true;
+    renderCart();
+    window.requestAnimationFrame(() => {
+      const form = document.getElementById("orderForm");
+      if (form) form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
   });
 
   document.getElementById("quoteFiles").addEventListener("change", (event) => {
@@ -463,17 +552,92 @@ function bindEvents() {
       : "Dosya seçilmedi";
   });
 
-  document.getElementById("quoteForm").addEventListener("submit", (event) => {
+  document.getElementById("quoteForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    event.currentTarget.reset();
-    document.getElementById("fileSummary").textContent = "Dosya seçilmedi";
-    showToast("Teklif talebiniz alındı. E-posta bildirimi sonraki evrede bağlanacak.");
+    const form = event.currentTarget;
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button.textContent;
+
+    if (isLocalPreview()) {
+      form.reset();
+      document.getElementById("fileSummary").textContent = "Dosya seçilmedi";
+      showToast("Form hazır. Hostinger'a yüklendiğinde e-posta ve dosya kaydı çalışacak.");
+      return;
+    }
+
+    button.textContent = "Gönderiliyor...";
+    button.disabled = true;
+    try {
+      const payload = await postForm("api/quote.php", new FormData(form));
+      form.reset();
+      document.getElementById("fileSummary").textContent = "Dosya seçilmedi";
+      showToast(`Teklif talebiniz alındı. Talep no: ${payload.request_id}`);
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      button.textContent = originalText;
+      button.disabled = false;
+    }
   });
 
-  document.getElementById("contactForm").addEventListener("submit", (event) => {
+  document.getElementById("contactForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    event.currentTarget.reset();
-    showToast("Mesajınız taslak olarak alındı.");
+    const form = event.currentTarget;
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button.textContent;
+
+    if (isLocalPreview()) {
+      form.reset();
+      showToast("Mesaj formu hazır. Hostinger'a yüklendiğinde e-posta gönderimi çalışacak.");
+      return;
+    }
+
+    button.textContent = "Gönderiliyor...";
+    button.disabled = true;
+    try {
+      const payload = await postForm("api/contact.php", new FormData(form));
+      form.reset();
+      showToast(`Mesajınız alındı. Mesaj no: ${payload.request_id}`);
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      button.textContent = originalText;
+      button.disabled = false;
+    }
+  });
+
+  document.body.addEventListener("submit", async (event) => {
+    if (event.target.id !== "orderForm") return;
+    event.preventDefault();
+
+    const form = event.target;
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button.textContent;
+
+    if (isLocalPreview()) {
+      showToast("Sipariş formu hazır. Hostinger'a yüklendiğinde e-posta bildirimi çalışacak.");
+      return;
+    }
+
+    const formData = new FormData(form);
+    formData.append("items", JSON.stringify(cartOrderItems()));
+    formData.append("total", formatPrice(calculateCartTotal()));
+
+    button.textContent = "Gönderiliyor...";
+    button.disabled = true;
+    try {
+      const payload = await postForm("api/order.php", formData);
+      state.cart = [];
+      state.checkoutOpen = false;
+      saveCart();
+      renderCart();
+      showToast(`Sipariş talebiniz alındı. Sipariş no: ${payload.request_id}`);
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      button.textContent = originalText;
+      button.disabled = false;
+    }
   });
 
   window.addEventListener("hashchange", routeFromHash);

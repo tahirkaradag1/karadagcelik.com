@@ -4,7 +4,7 @@ Karadag Celik icin WordPress/WooCommerce sinirlarindan cikarak ozel tasarimli on
 
 ## Mevcut Durum
 
-Bu repo su anda ilk MVP prototipini icerir. Prototip statik HTML/CSS/JS ile hazirlandi ve dogrudan tarayicida acilabilir.
+Bu repo su anda ilk MVP prototipini icerir. Prototip HTML/CSS/JS ile hazirlandi; Hostinger uzerinde PHP endpointleri ile teklif, iletisim ve magaza siparis talebi akislari canliya baglanabilir.
 
 Ana prototip:
 
@@ -33,12 +33,17 @@ Sitenin ana deneyimi iki kapi uzerine kuruldu:
 - Sagdan acilan sepet paneli
 - Profil ve Google giris prototipi
 - Iletisim sayfasi
+- PHP endpointleri:
+  - `prototype/api/quote.php`
+  - `prototype/api/contact.php`
+  - `prototype/api/order.php`
 
 ## Sonraki Evre
 
 Bu statik prototip, sonraki evrede gercek backend sistemine tasinacak:
 
-- Next.js veya uygun Node.js mimarisi
+- Ilk canli evre icin Hostinger PHP
+- Sonraki evre icin Next.js veya uygun Node.js mimarisi
 - MySQL/MariaDB veritabani
 - Google ile giris
 - Online teklif dosya yukleme ve e-posta bildirimi
@@ -52,6 +57,7 @@ Bu statik prototip, sonraki evrede gercek backend sistemine tasinacak:
 - `docs/PROJECT_BRIEF.md`
 - `docs/MVP_SCOPE.md`
 - `docs/NEXT_STEPS.md`
+- `docs/HOSTINGER_DEPLOYMENT.md`
 
 ## Guvenlik
 

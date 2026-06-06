@@ -156,7 +156,7 @@
               </div>
             </div>
 
-            <form class="quote-form tool-panel" id="quoteForm">
+            <form class="quote-form tool-panel" id="quoteForm" enctype="multipart/form-data">
               <div class="form-head">
                 <h2>Online Teklif Formu</h2>
                 <p>Talebiniz info@karadagcelik.com üzerinden takip edilir.</p>
@@ -179,6 +179,10 @@
                   <input name="email" type="email" autocomplete="email" required placeholder="ornek@firma.com" />
                 </label>
               </div>
+              <label>
+                Şehir / teslimat ili
+                <input name="city" autocomplete="address-level1" placeholder="Örn. Mersin" />
+              </label>
               <div class="split-fields three">
                 <label>
                   Malzeme
@@ -353,15 +357,15 @@
               <h2>E-posta Gönder</h2>
               <label>
                 Ad soyad
-                <input required placeholder="Adınız ve soyadınız" />
+                <input name="name" required placeholder="Adınız ve soyadınız" />
               </label>
               <label>
                 E-posta
-                <input required type="email" placeholder="ornek@firma.com" />
+                <input name="email" required type="email" placeholder="ornek@firma.com" />
               </label>
               <label>
                 Mesaj
-                <textarea required rows="5" placeholder="Bize nasıl yardımcı olabiliriz?"></textarea>
+                <textarea name="message" required rows="5" placeholder="Bize nasıl yardımcı olabiliriz?"></textarea>
               </label>
               <button class="primary-action" type="submit">Mesajı gönder</button>
             </form>

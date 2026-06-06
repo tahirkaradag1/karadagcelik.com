@@ -11,6 +11,9 @@ build/
 .cache/
 .DS_Store
 Thumbs.db
+prototype/api/config.php
+prototype/api/private_uploads/
+karadag_private_uploads/
 
 # Local Codex/app state
 .codex/
