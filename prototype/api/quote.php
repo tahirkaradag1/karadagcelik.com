@@ -92,6 +92,15 @@ MAIL;
 
 kc_send_mail([$email], 'Karadag Celik teklif talebiniz alindi - ' . $requestId, $customerBody, $config);
 
+if (!$internalSent) {
+    kc_json([
+        'ok' => false,
+        'request_id' => $requestId,
+        'mail_sent' => false,
+        'message' => 'Talebiniz kaydedildi fakat e-posta gonderilemedi. Talep no: ' . $requestId,
+    ], 502);
+}
+
 kc_json([
     'ok' => true,
     'request_id' => $requestId,

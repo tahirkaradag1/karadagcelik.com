@@ -89,6 +89,15 @@ MAIL;
 
 kc_send_mail([$email], 'Karadag Celik siparis talebiniz alindi - ' . $requestId, $customerBody, $config);
 
+if (!$internalSent) {
+    kc_json([
+        'ok' => false,
+        'request_id' => $requestId,
+        'mail_sent' => false,
+        'message' => 'Siparis kaydedildi fakat e-posta gonderilemedi. Siparis no: ' . $requestId,
+    ], 502);
+}
+
 kc_json([
     'ok' => true,
     'request_id' => $requestId,
