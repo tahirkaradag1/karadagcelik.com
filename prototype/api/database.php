@@ -142,6 +142,14 @@ CREATE TABLE IF NOT EXISTS orders (
     order_code VARCHAR(40) NOT NULL UNIQUE,
     status VARCHAR(40) NOT NULL DEFAULT 'new',
     payment_status VARCHAR(50) NOT NULL DEFAULT 'not_connected',
+    payment_provider VARCHAR(30) NOT NULL DEFAULT '',
+    payment_reference VARCHAR(64) NOT NULL DEFAULT '',
+    payment_amount_minor BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    provider_total_minor BIGINT UNSIGNED NULL,
+    payment_check_hash CHAR(64) NOT NULL DEFAULT '',
+    payment_failure_code VARCHAR(40) NOT NULL DEFAULT '',
+    payment_failure_message TEXT NULL,
+    paid_at DATETIME NULL,
     name VARCHAR(160) NOT NULL,
     phone VARCHAR(80) NOT NULL,
     email VARCHAR(190) NOT NULL,
@@ -259,6 +267,54 @@ SQL,
         'orders',
         'customer_id',
         'ALTER TABLE orders ADD COLUMN customer_id BIGINT UNSIGNED NULL AFTER id, ADD INDEX idx_order_customer (customer_id)'
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'payment_provider',
+        "ALTER TABLE orders ADD COLUMN payment_provider VARCHAR(30) NOT NULL DEFAULT '' AFTER payment_status"
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'payment_reference',
+        "ALTER TABLE orders ADD COLUMN payment_reference VARCHAR(64) NOT NULL DEFAULT '' AFTER payment_provider, ADD INDEX idx_order_payment_reference (payment_reference)"
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'payment_amount_minor',
+        'ALTER TABLE orders ADD COLUMN payment_amount_minor BIGINT UNSIGNED NOT NULL DEFAULT 0 AFTER payment_provider'
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'provider_total_minor',
+        'ALTER TABLE orders ADD COLUMN provider_total_minor BIGINT UNSIGNED NULL AFTER payment_amount_minor'
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'payment_check_hash',
+        "ALTER TABLE orders ADD COLUMN payment_check_hash CHAR(64) NOT NULL DEFAULT '' AFTER provider_total_minor"
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'payment_failure_code',
+        "ALTER TABLE orders ADD COLUMN payment_failure_code VARCHAR(40) NOT NULL DEFAULT '' AFTER payment_check_hash"
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'payment_failure_message',
+        'ALTER TABLE orders ADD COLUMN payment_failure_message TEXT NULL AFTER payment_failure_code'
+    );
+    kc_add_column_if_missing(
+        $pdo,
+        'orders',
+        'paid_at',
+        'ALTER TABLE orders ADD COLUMN paid_at DATETIME NULL AFTER payment_failure_message'
     );
 
     kc_seed_catalog($pdo);
@@ -433,13 +489,20 @@ function kc_db_store_order(array $config, array $metadata): bool
         $customer = (array)$metadata['customer'];
         $statement = $pdo->prepare(
             'INSERT INTO orders
-            (customer_id, order_code, payment_status, name, phone, email, address, total_text)
-            VALUES (:customer_id, :code, :payment_status, :name, :phone, :email, :address, :total)'
+            (customer_id, order_code, status, payment_status, payment_provider, payment_reference, payment_amount_minor,
+             payment_check_hash, name, phone, email, address, total_text)
+            VALUES (:customer_id, :code, :status, :payment_status, :payment_provider, :payment_reference, :payment_amount_minor,
+             :payment_check_hash, :name, :phone, :email, :address, :total)'
         );
         $statement->execute([
             'customer_id' => $metadata['customer_id'] ?? null,
             'code' => $metadata['request_id'],
+            'status' => $metadata['status'] ?? 'new',
             'payment_status' => $metadata['payment_status'],
+            'payment_provider' => $metadata['payment_provider'] ?? '',
+            'payment_reference' => $metadata['payment_reference'] ?? '',
+            'payment_amount_minor' => $metadata['total_minor'] ?? 0,
+            'payment_check_hash' => $metadata['payment_check_hash'] ?? '',
             'name' => $customer['name'],
             'phone' => $customer['phone'],
             'email' => $customer['email'],
@@ -472,6 +535,32 @@ function kc_db_store_order(array $config, array $metadata): bool
         }
         error_log('Order database save error: ' . $error->getMessage());
         return false;
+    }
+}
+
+function kc_db_update_order_payment_status(
+    array $config,
+    string $orderCode,
+    string $paymentStatus,
+    string $status = ''
+): void {
+    $pdo = kc_db_safe($config);
+    if (!$pdo) {
+        return;
+    }
+
+    try {
+        $sql = 'UPDATE orders SET payment_status = :payment_status';
+        $params = ['payment_status' => $paymentStatus, 'code' => $orderCode];
+        if ($status !== '') {
+            $sql .= ', status = :status';
+            $params['status'] = $status;
+        }
+        $sql .= ' WHERE order_code = :code';
+        $statement = $pdo->prepare($sql);
+        $statement->execute($params);
+    } catch (Throwable $error) {
+        error_log('Order payment status update error: ' . $error->getMessage());
     }
 }
 

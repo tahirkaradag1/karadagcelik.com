@@ -87,6 +87,7 @@ function kc_admin_status_label(string $status): string
 {
     return [
         'new' => 'Yeni',
+        'awaiting_payment' => 'Odeme bekleniyor',
         'in_review' => 'Inceleniyor',
         'quoted' => 'Teklif verildi',
         'confirmed' => 'Onaylandi',
@@ -98,6 +99,18 @@ function kc_admin_status_label(string $status): string
         'replied' => 'Yanıtlandi',
         'closed' => 'Kapatildi',
     ][$status] ?? ucfirst($status);
+}
+
+function kc_admin_payment_status_label(string $status): string
+{
+    return [
+        'not_connected' => 'Odeme bagli degil',
+        'payment_not_connected_yet' => 'Odeme bagli degil',
+        'pending' => 'Odeme bekleniyor',
+        'token_failed' => 'Odeme baslatilamadi',
+        'paid' => 'Odendi',
+        'failed' => 'Odeme basarisiz',
+    ][$status] ?? ucfirst(str_replace('_', ' ', $status));
 }
 
 function kc_admin_datetime(string $value): string

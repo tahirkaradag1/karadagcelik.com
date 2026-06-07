@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/common.php';
+require __DIR__ . '/payment.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') {
     kc_json(['ok' => false, 'message' => 'Only GET requests are allowed.'], 405);
@@ -54,7 +55,12 @@ try {
         ];
     }, $statement->fetchAll());
 
-    kc_json(['ok' => true, 'products' => $products]);
+    kc_json([
+        'ok' => true,
+        'products' => $products,
+        'payment_configured' => kc_paytr_configured($config),
+        'payment_provider' => kc_paytr_configured($config) ? 'paytr' : '',
+    ]);
 } catch (Throwable $error) {
     error_log('Product API error: ' . $error->getMessage());
     kc_json(['ok' => false, 'message' => 'Urunler su anda yuklenemiyor.'], 503);

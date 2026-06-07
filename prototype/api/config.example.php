@@ -26,6 +26,20 @@ return [
         'client_secret' => '',
         'redirect_uri' => 'https://karadagcelik.com/account/google-callback.php',
     ],
+    // PayTR iFrame API credentials are available in the PayTR merchant panel.
+    // Keep these values only in config.php on the server.
+    'paytr' => [
+        'merchant_id' => '',
+        'merchant_key' => '',
+        'merchant_salt' => '',
+        'test_mode' => true,
+        'debug_on' => true,
+        'no_installment' => false,
+        'max_installment' => 0,
+        'timeout_limit' => 30,
+        // Leave blank for automatic detection. During kc-test it resolves to /kc-test.
+        'base_url' => '',
+    ],
     // Store uploads outside public_html when possible.
     // If this path is not writable, api/common.php falls back to a local private_uploads folder.
     'upload_dir' => dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'karadag_private_uploads',

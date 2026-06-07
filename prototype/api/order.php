@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/common.php';
+require __DIR__ . '/payment.php';
 
 kc_require_post();
 
@@ -34,6 +35,9 @@ try {
 $items = $resolvedOrder['items'];
 $total = $resolvedOrder['total'];
 $requestId = kc_request_id('KCO');
+$paymentReference = str_replace('-', '', $requestId);
+$paytrConfigured = kc_paytr_configured($config);
+$paymentCheckToken = bin2hex(random_bytes(24));
 $lines = [];
 foreach ($items as $item) {
     $itemName = trim((string)($item['name'] ?? 'Urun'));
@@ -59,11 +63,56 @@ $metadata = [
     'total' => $total,
     'total_minor' => $resolvedOrder['total_minor'],
     'currency' => $resolvedOrder['currency'],
-    'payment_status' => 'payment_not_connected_yet',
+    'status' => $paytrConfigured ? 'awaiting_payment' : 'new',
+    'payment_status' => $paytrConfigured ? 'pending' : 'payment_not_connected_yet',
+    'payment_provider' => $paytrConfigured ? 'paytr' : '',
+    'payment_reference' => $paytrConfigured ? $paymentReference : '',
+    'payment_check_hash' => hash('sha256', $paymentCheckToken),
 ];
 
 kc_store_metadata($requestId, $metadata, $config);
 $databaseSaved = kc_db_store_order($config, $metadata);
+
+$customer = (array)$metadata['customer'];
+if ($paytrConfigured) {
+    if (!$databaseSaved) {
+        kc_json([
+            'ok' => false,
+            'message' => 'Siparis odeme oncesinde guvenli sekilde kaydedilemedi. Lutfen tekrar deneyin.',
+        ], 503);
+    }
+
+    try {
+        $payment = kc_paytr_create_iframe(
+            $config,
+            $requestId,
+            $paymentReference,
+            $customer,
+            $items,
+            (int)$resolvedOrder['total_minor']
+        );
+    } catch (Throwable $error) {
+        error_log('PayTR token error: ' . $error->getMessage());
+        kc_db_update_order_payment_status($config, $requestId, 'token_failed', 'cancelled');
+        kc_json([
+            'ok' => false,
+            'request_id' => $requestId,
+            'message' => 'Guvenli odeme ekrani su anda acilamadi. Lutfen tekrar deneyin.',
+        ], 502);
+    }
+
+    kc_json([
+        'ok' => true,
+        'request_id' => $requestId,
+        'database_saved' => true,
+        'payment_required' => true,
+        'payment_provider' => 'paytr',
+        'payment_iframe_url' => $payment['iframe_url'],
+        'payment_check_token' => $paymentCheckToken,
+        'test_mode' => $payment['test_mode'],
+        'message' => 'Siparis olusturuldu. Guvenli odeme ekranina geciliyor.',
+    ]);
+}
 
 $body = <<<MAIL
 Yeni magaza siparis talebi alindi.
@@ -118,5 +167,6 @@ kc_json([
     'request_id' => $requestId,
     'mail_sent' => $internalSent,
     'database_saved' => $databaseSaved,
+    'payment_required' => false,
     'message' => 'Siparis talebiniz alindi.',
 ]);

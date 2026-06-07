@@ -1640,6 +1640,56 @@ details p {
   font-size: 13px;
 }
 
+.payment-panel,
+.payment-result {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.payment-panel-heading h3,
+.payment-result h3 {
+  margin: 4px 0 6px;
+}
+
+.payment-panel-heading p,
+.payment-result p,
+.payment-waiting {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.payment-test-badge {
+  justify-self: start;
+  padding: 6px 9px;
+  border-radius: 4px;
+  background: #fff3cd;
+  color: #705500;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.payment-frame {
+  width: 100%;
+  min-height: 620px;
+  border: 0;
+  background: #fff;
+}
+
+.payment-result.success {
+  border-color: rgba(15, 118, 110, 0.32);
+  background: linear-gradient(145deg, rgba(15, 118, 110, 0.1), #fff 55%);
+}
+
+.payment-result.failed {
+  border-color: rgba(180, 70, 45, 0.28);
+  background: linear-gradient(145deg, rgba(180, 70, 45, 0.08), #fff 55%);
+}
+
 .cart-thumb {
   width: 58px;
   height: 58px;

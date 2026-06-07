@@ -21,7 +21,7 @@ $definitions = [
         'table' => 'orders',
         'title' => 'Siparis Detayi',
         'active' => 'orders',
-        'statuses' => ['new', 'confirmed', 'preparing', 'shipped', 'completed', 'cancelled'],
+        'statuses' => ['awaiting_payment', 'new', 'confirmed', 'preparing', 'shipped', 'completed', 'cancelled'],
     ],
     'message' => [
         'table' => 'contact_messages',
@@ -115,6 +115,8 @@ kc_admin_page_start($definition['title'], $definition['active']);
                 <div><span>Telefon</span><strong><a href="tel:<?= kc_admin_escape($record['phone']) ?>"><?= kc_admin_escape($record['phone']) ?></a></strong></div>
                 <div><span>E-posta</span><strong><a href="mailto:<?= kc_admin_escape($record['email']) ?>"><?= kc_admin_escape($record['email']) ?></a></strong></div>
                 <div><span>Toplam</span><strong><?= kc_admin_escape($record['total_text']) ?></strong></div>
+                <div><span>Odeme</span><strong><?= kc_admin_escape(kc_admin_payment_status_label($record['payment_status'])) ?></strong></div>
+                <div><span>Odeme saglayicisi</span><strong><?= kc_admin_escape($record['payment_provider'] ?: '-') ?></strong></div>
             </div>
             <div class="text-block"><span>Teslimat adresi</span><p><?= nl2br(kc_admin_escape($record['address'])) ?></p></div>
             <div class="subsection">
@@ -163,4 +165,3 @@ kc_admin_page_start($definition['title'], $definition['active']);
     </aside>
 </section>
 <?php kc_admin_page_end(); ?>
-

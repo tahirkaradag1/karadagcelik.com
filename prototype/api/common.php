@@ -29,6 +29,17 @@ function kc_config(): array
             'client_secret' => '',
             'redirect_uri' => '',
         ],
+        'paytr' => [
+            'merchant_id' => '',
+            'merchant_key' => '',
+            'merchant_salt' => '',
+            'test_mode' => true,
+            'debug_on' => true,
+            'no_installment' => false,
+            'max_installment' => 0,
+            'timeout_limit' => 30,
+            'base_url' => '',
+        ],
     ];
 
     $file = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';

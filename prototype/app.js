@@ -89,7 +89,12 @@ const state = {
   activeProductId: products[0].id,
   detailQty: 1,
   checkoutOpen: false,
+  payment: null,
+  paymentResult: null,
+  paymentConfigured: false,
 };
+
+let paymentPollTimer = null;
 
 const views = [...document.querySelectorAll(".view")];
 const dock = document.getElementById("dock");
@@ -151,6 +156,7 @@ async function loadProducts() {
     const payload = await response.json();
     if (response.ok && payload.ok && Array.isArray(payload.products) && payload.products.length) {
       products = payload.products;
+      state.paymentConfigured = Boolean(payload.payment_configured);
       state.activeProductId = products[0].id;
       state.cart = state.cart.filter((line) => products.some((product) => product.id === line.id));
       saveCart();
@@ -309,8 +315,13 @@ function updateCartBadge() {
 }
 
 function addToCart(productId, qty = 1) {
+  if (state.payment) {
+    showToast("Ödeme sürerken sepet değiştirilemez.");
+    return;
+  }
   const product = products.find((item) => item.id === productId);
   if (!product) return;
+  state.paymentResult = null;
   const line = state.cart.find((item) => item.id === productId);
   if (line) {
     line.qty += qty;
@@ -323,6 +334,10 @@ function addToCart(productId, qty = 1) {
 }
 
 function updateCartLine(productId, delta) {
+  if (state.payment) {
+    showToast("Ödeme sürerken sepet değiştirilemez.");
+    return;
+  }
   const line = state.cart.find((item) => item.id === productId);
   if (!line) return;
   line.qty += delta;
@@ -334,6 +349,10 @@ function updateCartLine(productId, delta) {
 }
 
 function removeCartLine(productId) {
+  if (state.payment) {
+    showToast("Ödeme sürerken sepet değiştirilemez.");
+    return;
+  }
   state.cart = state.cart.filter((item) => item.id !== productId);
   if (!state.cart.length) {
     state.checkoutOpen = false;
@@ -363,12 +382,16 @@ function cartOrderItems() {
 }
 
 function checkoutFormHtml() {
+  const paymentCopy = state.paymentConfigured
+    ? "Bilgilerinizi doğruladıktan sonra güvenli ödeme ekranı açılır."
+    : "Ödeme sistemi bağlanana kadar sipariş talebiniz ekibimize iletilir.";
+  const submitLabel = state.paymentConfigured ? "Güvenli ödemeye geç" : "Sipariş talebini gönder";
   return `
     <form class="checkout-form" id="orderForm">
       <div>
         <span class="eyebrow">Sipariş bilgileri</span>
-        <h3>Mağaza sipariş talebi</h3>
-        <p>Canlı ödeme bağlanana kadar bu form sipariş talebini ekibe iletir.</p>
+        <h3>${state.paymentConfigured ? "Mağaza siparişi" : "Mağaza sipariş talebi"}</h3>
+        <p>${paymentCopy}</p>
       </div>
       <label>
         Ad soyad
@@ -386,18 +409,71 @@ function checkoutFormHtml() {
         Teslimat adresi
         <textarea name="address" required rows="3" placeholder="İl, ilçe, açık adres"></textarea>
       </label>
-      <button class="primary-action full" type="submit">Sipariş talebini gönder</button>
+      <button class="primary-action full" type="submit">${submitLabel}</button>
     </form>
+  `;
+}
+
+function paymentFrameHtml() {
+  if (!state.payment) return "";
+  return `
+    <section class="payment-panel">
+      <div class="payment-panel-heading">
+        <span class="eyebrow">Güvenli ödeme</span>
+        <h3>PayTR ödeme ekranı</h3>
+        <p>Kart bilgileriniz Karadağ Çelik sunucularına kaydedilmez.</p>
+      </div>
+      ${state.payment.testMode ? `<div class="payment-test-badge">TEST MODU</div>` : ""}
+      <iframe
+        class="payment-frame"
+        src="${escapeHtml(state.payment.iframeUrl)}"
+        title="PayTR güvenli ödeme"
+        frameborder="0"
+        scrolling="yes"
+        allow="payment"
+      ></iframe>
+      <p class="payment-waiting">Ödeme sonucunuz banka ve PayTR tarafından doğrulanacaktır.</p>
+    </section>
+  `;
+}
+
+function paymentResultHtml() {
+  if (!state.paymentResult) return "";
+  const success = state.paymentResult.status === "paid";
+  return `
+    <section class="payment-result ${success ? "success" : "failed"}">
+      <span class="eyebrow">${success ? "Ödeme tamamlandı" : "Ödeme tamamlanamadı"}</span>
+      <h3>${success ? "Siparişiniz alındı." : "Ürünleriniz sepette duruyor."}</h3>
+      <p>${success
+        ? `Sipariş numaranız: ${escapeHtml(state.paymentResult.orderCode)}`
+        : "Kart bilgilerinizi kontrol ederek güvenli ödeme adımını yeniden başlatabilirsiniz."}</p>
+      <button class="primary-action full" type="button" data-payment-result-action>
+        ${success ? "Alışverişe devam et" : "Ödemeyi yeniden dene"}
+      </button>
+    </section>
   `;
 }
 
 function renderCart() {
   updateCartBadge();
+  if (state.paymentResult) {
+    cartItems.innerHTML = paymentResultHtml();
+    cartTotal.textContent = state.paymentResult.total || formatPrice(0);
+    const checkoutButton = document.getElementById("checkoutButton");
+    checkoutButton.disabled = true;
+    checkoutButton.innerHTML = `<svg><use href="#icon-credit" /></svg> ${
+      state.paymentResult.status === "paid" ? "Ödeme tamamlandı" : "Yeniden deneyebilirsiniz"
+    }`;
+    return;
+  }
+
   if (!state.cart.length) {
     cartItems.innerHTML = `<div class="cart-empty"><p>Sepetiniz şu an boş.</p></div>`;
     cartTotal.textContent = formatPrice(0);
     document.getElementById("checkoutButton").disabled = false;
-    document.getElementById("checkoutButton").innerHTML = `<svg><use href="#icon-credit" /></svg> Ödeme adımına geç`;
+    document.getElementById("checkoutButton").innerHTML = `<svg><use href="#icon-credit" /></svg> ${
+      state.paymentConfigured ? "Ödeme adımına geç" : "Sipariş talebi oluştur"
+    }`;
     return;
   }
 
@@ -433,16 +509,86 @@ function renderCart() {
     })
     .join("");
 
-  if (state.checkoutOpen) {
+  if (state.payment) {
+    cartItems.insertAdjacentHTML("beforeend", paymentFrameHtml());
+  } else if (state.checkoutOpen) {
     cartItems.insertAdjacentHTML("beforeend", checkoutFormHtml());
   }
 
   cartTotal.textContent = formatPrice(total);
   const checkoutButton = document.getElementById("checkoutButton");
-  checkoutButton.disabled = state.checkoutOpen;
-  checkoutButton.innerHTML = state.checkoutOpen
-    ? `<svg><use href="#icon-credit" /></svg> Formu doldurun`
-    : `<svg><use href="#icon-credit" /></svg> Ödeme adımına geç`;
+  checkoutButton.disabled = state.checkoutOpen || Boolean(state.payment);
+  checkoutButton.innerHTML = state.payment
+    ? `<svg><use href="#icon-credit" /></svg> Ödeme ekranı açık`
+    : state.checkoutOpen
+      ? `<svg><use href="#icon-credit" /></svg> Formu doldurun`
+      : `<svg><use href="#icon-credit" /></svg> ${
+          state.paymentConfigured ? "Ödeme adımına geç" : "Sipariş talebi oluştur"
+        }`;
+}
+
+function stopPaymentPolling() {
+  if (paymentPollTimer) {
+    window.clearInterval(paymentPollTimer);
+    paymentPollTimer = null;
+  }
+}
+
+async function checkPaymentStatus() {
+  if (!state.payment) return;
+  const query = new URLSearchParams({
+    order: state.payment.orderCode,
+    token: state.payment.checkToken,
+    _: String(Date.now()),
+  });
+
+  try {
+    const response = await fetch(`api/payment-status.php?${query}`, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+    const payload = await response.json();
+    if (!response.ok || payload.ok === false) return;
+
+    if (payload.payment_status === "paid") {
+      stopPaymentPolling();
+      const orderCode = state.payment.orderCode;
+      state.payment = null;
+      state.cart = [];
+      state.checkoutOpen = false;
+      state.paymentResult = {
+        status: "paid",
+        orderCode,
+        total: payload.total,
+      };
+      saveCart();
+      renderCart();
+      showToast(`Ödemeniz alındı. Sipariş no: ${orderCode}`);
+      return;
+    }
+
+    if (payload.payment_status === "failed") {
+      stopPaymentPolling();
+      const orderCode = state.payment.orderCode;
+      state.payment = null;
+      state.checkoutOpen = false;
+      state.paymentResult = {
+        status: "failed",
+        orderCode,
+        total: payload.total,
+      };
+      renderCart();
+      showToast("Ödeme tamamlanamadı. Sepetiniz korunuyor.");
+    }
+  } catch {
+    // Temporary status request failures must not interrupt the payment iframe.
+  }
+}
+
+function startPaymentPolling() {
+  stopPaymentPolling();
+  void checkPaymentStatus();
+  paymentPollTimer = window.setInterval(checkPaymentStatus, 2500);
 }
 
 function openCart() {
@@ -468,6 +614,13 @@ function accountStatusLabel(status) {
     completed: "Tamamlandı",
     cancelled: "İptal edildi",
   }[status] || status;
+}
+
+function accountOrderStatusLabel(order) {
+  if (order.payment_status === "pending") return "Ödeme bekleniyor";
+  if (order.payment_status === "token_failed") return "Ödeme başlatılamadı";
+  if (order.payment_status === "failed") return "Ödeme başarısız";
+  return accountStatusLabel(order.status);
 }
 
 function accountDate(value) {
@@ -557,7 +710,7 @@ async function renderProfile() {
           <div class="account-heading"><div><span class="eyebrow">Mağaza</span><h3>Sipariş geçmişi</h3></div></div>
           <div class="account-records">
             ${orders.length
-              ? orders.map((order) => `<div><span><strong>${escapeHtml(order.code)}</strong><small>${escapeHtml(order.total_text)}</small></span><span><b>${escapeHtml(accountStatusLabel(order.status))}</b><small>${accountDate(order.created_at)}</small></span></div>`).join("")
+              ? orders.map((order) => `<div><span><strong>${escapeHtml(order.code)}</strong><small>${escapeHtml(order.total_text)}</small></span><span><b>${escapeHtml(accountOrderStatusLabel(order))}</b><small>${accountDate(order.created_at)}</small></span></div>`).join("")
               : `<p class="account-empty">Henüz mağaza siparişiniz yok.</p>`}
           </div>
         </section>
@@ -609,6 +762,18 @@ function bindEvents() {
       removeCartLine(cartRemove.dataset.cartRemove);
     }
 
+    const paymentResultAction = event.target.closest("[data-payment-result-action]");
+    if (paymentResultAction) {
+      const wasSuccessful = state.paymentResult?.status === "paid";
+      state.paymentResult = null;
+      if (wasSuccessful) {
+        renderCart();
+        closeCart();
+      } else {
+        state.checkoutOpen = true;
+        renderCart();
+      }
+    }
   });
 
   document.getElementById("cartTrigger").addEventListener("click", openCart);
@@ -727,6 +892,21 @@ function bindEvents() {
     button.disabled = true;
     try {
       const payload = await postForm("api/order.php", formData);
+      if (payload.payment_required) {
+        state.checkoutOpen = false;
+        state.paymentResult = null;
+        state.payment = {
+          orderCode: payload.request_id,
+          checkToken: payload.payment_check_token,
+          iframeUrl: payload.payment_iframe_url,
+          testMode: Boolean(payload.test_mode),
+        };
+        renderCart();
+        startPaymentPolling();
+        showToast("Güvenli ödeme ekranı açıldı.");
+        return;
+      }
+
       state.cart = [];
       state.checkoutOpen = false;
       saveCart();
@@ -741,6 +921,11 @@ function bindEvents() {
   });
 
   window.addEventListener("hashchange", routeFromHash);
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.data?.source !== "kc-paytr-return") return;
+    if (!state.payment || event.data.order !== state.payment.orderCode) return;
+    void checkPaymentStatus();
+  });
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && window.location.hash === "#profile") {
       void renderProfile();
