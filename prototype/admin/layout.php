@@ -5,6 +5,7 @@ declare(strict_types=1);
 function kc_admin_page_start(string $title, string $active = ''): void
 {
     $user = kc_admin_user();
+    $liveRefresh = in_array($active, ['dashboard', 'quotes', 'orders', 'customers', 'messages'], true);
     $nav = [
         'dashboard' => ['index.php', 'Genel Bakis'],
         'quotes' => ['quotes.php', 'Teklifler'],
@@ -23,7 +24,7 @@ function kc_admin_page_start(string $title, string $active = ''): void
     <title><?= kc_admin_escape($title) ?> | Karadag Celik Yonetim</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body<?= $liveRefresh ? ' data-live-refresh="true"' : '' ?>>
 <div class="admin-shell">
     <aside class="sidebar">
         <a class="brand" href="index.php">
@@ -58,6 +59,32 @@ function kc_admin_page_end(): void
     ?>
     </main>
 </div>
+<script>
+(() => {
+    if (document.body.dataset.liveRefresh !== 'true') return;
+
+    let hiddenAt = 0;
+    let loadedAt = Date.now();
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            hiddenAt = Date.now();
+            return;
+        }
+
+        if (hiddenAt && Date.now() - hiddenAt > 1000) {
+            window.location.reload();
+        }
+    });
+
+    window.setInterval(() => {
+        if (!document.hidden && Date.now() - loadedAt >= 30000) {
+            loadedAt = Date.now();
+            window.location.reload();
+        }
+    }, 30000);
+})();
+</script>
 </body>
 </html>
 <?php

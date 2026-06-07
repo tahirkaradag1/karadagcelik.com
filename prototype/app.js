@@ -181,6 +181,10 @@ function navigate(view, productId, pushHash = true) {
     renderProductDetail(productId || state.activeProductId);
   }
 
+  if (view === "profile" && (!pushHash || window.location.hash === "#profile")) {
+    void renderProfile();
+  }
+
   if (pushHash) {
     setHash(view, productId);
   }
@@ -482,7 +486,10 @@ async function renderProfile() {
   }
 
   try {
-    const response = await fetch("api/account.php", { headers: { Accept: "application/json" } });
+    const response = await fetch(`api/account.php?_=${Date.now()}`, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
     const payload = await response.json();
     if (!payload.logged_in) {
       profilePanel.innerHTML = `
@@ -734,13 +741,17 @@ function bindEvents() {
   });
 
   window.addEventListener("hashchange", routeFromHash);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && window.location.hash === "#profile") {
+      void renderProfile();
+    }
+  });
 }
 
 async function initialize() {
   await loadProducts();
   renderProducts();
   renderCart();
-  await renderProfile();
   bindEvents();
   routeFromHash();
 }
