@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 24 790 570" role="img" aria-label="">
+  <defs>
+    <linearGradient id="kcq-steel-dark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161b1f"/>
+      <stop offset=".42" stop-color="#475158"/>
+      <stop offset=".72" stop-color="#9ba6ab"/>
+      <stop offset="1" stop-color="#d8dddf"/>
+    </linearGradient>
+    <linearGradient id="kcq-brushed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbfb"/>
+      <stop offset=".34" stop-color="#c7d0d3"/>
+      <stop offset=".68" stop-color="#7d8a90"/>
+      <stop offset="1" stop-color="#ecf0f1"/>
+    </linearGradient>
+    <linearGradient id="kcq-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".86"/>
+      <stop offset=".52" stop-color="#dce7e8" stop-opacity=".58"/>
+      <stop offset="1" stop-color="#9fafb4" stop-opacity=".44"/>
+    </linearGradient>
+    <linearGradient id="kcq-teal-beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset=".28" stop-color="#dffcf8" stop-opacity=".72"/>
+      <stop offset=".68" stop-color="#30c7b7" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#ffb150"/>
+    </linearGradient>
+    <linearGradient id="kcq-cut" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff2c9" stop-opacity="0"/>
+      <stop offset=".44" stop-color="#ffe1a1"/>
+      <stop offset="1" stop-color="#ff9b30" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="kcq-bed-lines" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(-7)">
+      <path d="M0 0H22" stroke="#ffffff" stroke-opacity=".13" stroke-width="2"/>
+      <path d="M0 11H22" stroke="#0b1215" stroke-opacity=".26" stroke-width="1"/>
+    </pattern>
+    <filter id="kcq-soft-shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="26" stdDeviation="22" flood-color="#111719" flood-opacity=".24"/>
+    </filter>
+    <filter id="kcq-glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <ellipse cx="500" cy="556" rx="282" ry="52" fill="#111719" opacity=".16"/>
+  <ellipse cx="520" cy="546" rx="214" ry="30" fill="#0f766e" opacity=".08"/>
+
+  <g filter="url(#kcq-soft-shadow)">
+    <path d="M170 344 706 246 792 477 238 566Z" fill="url(#kcq-steel-dark)"/>
+    <path d="M170 344 706 246 792 477 238 566Z" fill="url(#kcq-bed-lines)" opacity=".78"/>
+    <path d="M188 354 699 262 773 462 250 546Z" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="3"/>
+    <path d="M255 406 640 336" stroke="#ffffff" stroke-opacity=".16" stroke-width="3"/>
+    <path d="M279 455 672 382" stroke="#ffffff" stroke-opacity=".14" stroke-width="3"/>
+    <path d="M306 504 704 431" stroke="#ffffff" stroke-opacity=".12" stroke-width="3"/>
+  </g>
+
+  <g filter="url(#kcq-soft-shadow)">
+    <path d="M520 360 772 320 796 454 548 502Z" fill="url(#kcq-brushed)"/>
+    <path d="M520 360 772 320 796 454 548 502Z" fill="#ffffff" opacity=".18"/>
+    <path d="M548 381 746 351" stroke="#ffffff" stroke-opacity=".42" stroke-width="3"/>
+    <path d="M568 421 768 388" stroke="#1c252a" stroke-opacity=".14" stroke-width="2"/>
+  </g>
+
+  <g filter="url(#kcq-soft-shadow)" opacity=".92">
+    <path d="M276 385 466 350 522 520 326 558Z" fill="url(#kcq-glass)"/>
+    <path d="M308 420 430 397" stroke="#ffffff" stroke-opacity=".52" stroke-width="4"/>
+    <path d="M326 456 452 432" stroke="#0f766e" stroke-opacity=".22" stroke-width="3"/>
+    <path d="M344 494 470 470" stroke="#111719" stroke-opacity=".16" stroke-width="3"/>
+    <path d="M368 413 414 510" stroke="#ffffff" stroke-opacity=".3" stroke-width="3"/>
+  </g>
+
+  <g filter="url(#kcq-soft-shadow)">
+    <path d="M472 34H616C638 34 656 52 656 74V214C656 235 641 253 620 257L508 278C483 283 460 264 460 238V46C460 39 465 34 472 34Z" fill="url(#kcq-brushed)"/>
+    <path d="M496 70H625C633 70 640 77 640 85V204C640 216 632 226 620 228L505 250C490 253 476 242 476 226V90C476 79 485 70 496 70Z" fill="#eff4f4" opacity=".58"/>
+    <path d="M522 258H592V315C592 334 577 349 558 349C538 349 522 333 522 313V258Z" fill="#334046"/>
+    <path d="M542 314H573V366H542Z" fill="#182126"/>
+    <path d="M533 365H584L568 394H548Z" fill="#0d1519"/>
+  </g>
+
+  <path d="M558 306V441" stroke="url(#kcq-teal-beam)" stroke-width="8" stroke-linecap="round" filter="url(#kcq-glow)"/>
+  <path d="M520 431H650" stroke="url(#kcq-cut)" stroke-width="14" stroke-linecap="round" filter="url(#kcq-glow)"/>
+
+  <g filter="url(#kcq-glow)">
+    <path d="M556 442 482 401" stroke="#ffc067" stroke-width="8" stroke-linecap="round"/>
+    <path d="M558 444 468 444" stroke="#ffaf43" stroke-width="7" stroke-linecap="round"/>
+    <path d="M560 444 494 496" stroke="#ff9d35" stroke-width="7" stroke-linecap="round"/>
+    <path d="M563 442 526 508" stroke="#fff3cd" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="558" cy="442" r="12" fill="#fff6d3"/>
+  </g>
+
+  <g filter="url(#kcq-soft-shadow)" opacity=".9">
+    <path d="M86 132H334C350 132 363 145 363 161V295C363 313 348 327 330 324L91 285C77 283 66 271 66 257V152C66 141 75 132 86 132Z" fill="url(#kcq-glass)"/>
+    <path d="M105 174H246" stroke="#0f766e" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+    <path d="M105 213H310" stroke="#20272b" stroke-opacity=".18" stroke-width="4" stroke-linecap="round"/>
+    <path d="M105 250H284" stroke="#20272b" stroke-opacity=".14" stroke-width="4" stroke-linecap="round"/>
+    <path d="M281 154L332 204 281 204Z" fill="#ffffff" opacity=".72"/>
+    <path d="M281 154V204H332" fill="none" stroke="#0f766e" stroke-opacity=".24" stroke-width="4"/>
+  </g>
+</svg>

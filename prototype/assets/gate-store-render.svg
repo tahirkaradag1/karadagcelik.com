@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 48 760 540" role="img" aria-label="">
+  <defs>
+    <linearGradient id="kcs-steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbfcfc"/>
+      <stop offset=".28" stop-color="#d1d8db"/>
+      <stop offset=".58" stop-color="#8b969d"/>
+      <stop offset=".82" stop-color="#485057"/>
+      <stop offset="1" stop-color="#f2f4f4"/>
+    </linearGradient>
+    <linearGradient id="kcs-dark-steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22282c"/>
+      <stop offset=".48" stop-color="#6f7a80"/>
+      <stop offset="1" stop-color="#cfd5d7"/>
+    </linearGradient>
+    <linearGradient id="kcs-warm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffaf2"/>
+      <stop offset=".44" stop-color="#d7c2a2"/>
+      <stop offset=".72" stop-color="#b8782c"/>
+      <stop offset="1" stop-color="#f6e4c6"/>
+    </linearGradient>
+    <linearGradient id="kcs-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".8"/>
+      <stop offset=".58" stop-color="#dde5e7" stop-opacity=".52"/>
+      <stop offset="1" stop-color="#89979f" stop-opacity=".35"/>
+    </linearGradient>
+    <pattern id="kcs-brush" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(16)">
+      <path d="M0 5H24" stroke="#ffffff" stroke-opacity=".22" stroke-width="2"/>
+      <path d="M0 17H24" stroke="#151b1f" stroke-opacity=".14" stroke-width="1"/>
+    </pattern>
+    <filter id="kcs-shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="26" stdDeviation="22" flood-color="#111719" flood-opacity=".22"/>
+    </filter>
+    <filter id="kcs-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <ellipse cx="488" cy="564" rx="318" ry="54" fill="#171717" opacity=".15"/>
+  <path d="M166 511C230 462 672 423 778 468C820 486 791 529 690 548C535 576 261 575 174 544C130 528 132 537 166 511Z" fill="#cc7a1a" opacity=".08"/>
+
+  <g filter="url(#kcs-shadow)">
+    <path d="M154 398H704C739 398 768 427 768 462V493C768 528 739 557 704 557H154C119 557 90 528 90 493V462C90 427 119 398 154 398Z" fill="url(#kcs-dark-steel)"/>
+    <path d="M154 398H704C739 398 768 427 768 462V493C768 528 739 557 704 557H154C119 557 90 528 90 493V462C90 427 119 398 154 398Z" fill="url(#kcs-brush)" opacity=".42"/>
+    <path d="M124 423H728" stroke="#ffffff" stroke-opacity=".26" stroke-width="4"/>
+  </g>
+
+  <g filter="url(#kcs-shadow)">
+    <path d="M182 230 404 190C428 186 450 202 455 226L486 381C491 406 474 430 449 433L226 465C204 468 184 454 179 432L151 274C147 253 161 234 182 230Z" fill="url(#kcs-steel)"/>
+    <path d="M182 230 404 190C428 186 450 202 455 226L486 381C491 406 474 430 449 433L226 465C204 468 184 454 179 432L151 274C147 253 161 234 182 230Z" fill="url(#kcs-brush)" opacity=".4"/>
+    <path d="M208 268 385 236C396 234 407 242 409 253L426 341C428 353 420 364 408 366L232 396C220 398 210 390 208 378L191 291C189 280 196 270 208 268Z" fill="none" stroke="#20272c" stroke-opacity=".26" stroke-width="14"/>
+    <path d="M201 248 397 213" stroke="#ffffff" stroke-opacity=".42" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#kcs-shadow)">
+    <path d="M586 128C682 128 760 206 760 302C760 398 682 476 586 476C490 476 412 398 412 302C412 206 490 128 586 128Z" fill="url(#kcs-steel)"/>
+    <path d="M586 187C649 187 701 239 701 302C701 365 649 417 586 417C523 417 471 365 471 302C471 239 523 187 586 187Z" fill="#ffffff"/>
+    <path d="M586 224C629 224 664 259 664 302C664 345 629 380 586 380C543 380 508 345 508 302C508 259 543 224 586 224Z" fill="#f7f7f4"/>
+    <path d="M458 220C511 153 624 137 699 190" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="9" stroke-linecap="round"/>
+    <path d="M474 408C527 459 624 467 692 416" fill="none" stroke="#1d252a" stroke-opacity=".18" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#kcs-shadow)">
+    <path d="M424 358 738 412 713 548 399 494Z" fill="url(#kcs-steel)"/>
+    <path d="M424 358 738 412 713 548 399 494Z" fill="url(#kcs-brush)" opacity=".44"/>
+    <path d="M460 400 706 443" stroke="#ffffff" stroke-opacity=".45" stroke-width="5" stroke-linecap="round"/>
+    <path d="M450 452 692 494" stroke="#1b2226" stroke-opacity=".14" stroke-width="4" stroke-linecap="round"/>
+    <path d="M550 381 529 510" stroke="#ffffff" stroke-opacity=".24" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#kcs-shadow)">
+    <path d="M586 62H720C748 62 772 84 775 112L790 248C793 280 768 308 736 308H607C579 308 556 287 552 260L533 122C528 90 553 62 586 62Z" fill="url(#kcs-glass)"/>
+    <path d="M606 108H732C744 108 754 117 756 129L765 218C767 233 755 246 740 246H618C606 246 595 237 594 225L582 137C580 122 591 108 606 108Z" fill="none" stroke="#2d3438" stroke-opacity=".28" stroke-width="13"/>
+    <path d="M604 91H732" stroke="#ffffff" stroke-opacity=".52" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#kcs-shadow)">
+    <path d="M296 456 592 410 610 506 314 552Z" fill="url(#kcs-warm)" opacity=".9"/>
+    <path d="M323 482 565 444" stroke="#ffffff" stroke-opacity=".45" stroke-width="5" stroke-linecap="round"/>
+    <path d="M334 520 582 482" stroke="#2a1a0a" stroke-opacity=".12" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g opacity=".92" filter="url(#kcs-soft)">
+    <circle cx="736" cy="159" r="10" fill="#cc7a1a"/>
+    <circle cx="432" cy="214" r="7" fill="#0f766e"/>
+    <circle cx="344" cy="444" r="6" fill="#cc7a1a"/>
+  </g>
+</svg>
