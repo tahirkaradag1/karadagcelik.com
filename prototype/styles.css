@@ -2145,25 +2145,25 @@ details p {
   }
 }
 
-@media (max-width: 440px) {
+@media (max-width: 520px) {
   .gate-copy {
     max-width: 100%;
   }
 
   .gate-visual {
     display: block;
-    left: 54%;
-    right: auto;
-    bottom: 4px;
-    width: 64%;
-    transform: translateX(-27%);
-    opacity: 0.9;
+    left: auto;
+    right: -20px;
+    bottom: -4px;
+    width: 115%;
+    transform: none;
+    opacity: 0.96;
   }
 
   .quote-render,
   .store-render {
-    width: 64%;
-    bottom: 4px;
+    width: 115%;
+    bottom: -4px;
   }
 
   .dock {
