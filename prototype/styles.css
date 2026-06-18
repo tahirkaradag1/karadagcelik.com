@@ -293,20 +293,19 @@ svg {
 
 .gate-visual {
   position: absolute;
-  right: 26px;
-  bottom: 26px;
-  width: min(56%, 500px);
-  aspect-ratio: 1.36;
+  left: 50%;
+  right: auto;
+  bottom: 14px;
+  width: min(100%, 780px);
+  aspect-ratio: 16 / 10;
+  transform: translateX(-43%);
   pointer-events: none;
 }
 
 .gate-render {
   z-index: 1;
-  overflow: hidden;
-  border-radius: 26px;
-  filter: drop-shadow(0 24px 42px rgba(18, 22, 24, 0.12));
-  -webkit-mask-image: radial-gradient(ellipse 92% 94% at 68% 58%, #000 64%, transparent 100%);
-  mask-image: radial-gradient(ellipse 92% 94% at 68% 58%, #000 64%, transparent 100%);
+  overflow: visible;
+  filter: drop-shadow(0 24px 36px rgba(18, 22, 24, 0.13));
 }
 
 .gate-render::before {
@@ -319,20 +318,16 @@ svg {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: right center;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 .quote-render {
-  right: -18px;
-  bottom: 8px;
-  width: min(62%, 560px);
+  bottom: 12px;
 }
 
 .store-render {
-  right: -14px;
-  bottom: 8px;
-  width: min(62%, 560px);
+  bottom: 12px;
 }
 
 .laser-visual {
@@ -2043,15 +2038,18 @@ details p {
   }
 
   .gate-visual {
-    width: 38%;
-    right: 4px;
-    bottom: 8px;
-    opacity: 0.92;
+    left: 52%;
+    right: auto;
+    bottom: 5px;
+    width: 70%;
+    transform: translateX(-31%);
+    opacity: 0.95;
   }
 
   .quote-render,
   .store-render {
-    width: 38%;
+    width: 70%;
+    bottom: 5px;
   }
 
   .gate-action {
@@ -2153,7 +2151,19 @@ details p {
   }
 
   .gate-visual {
-    display: none;
+    display: block;
+    left: 54%;
+    right: auto;
+    bottom: 4px;
+    width: 64%;
+    transform: translateX(-27%);
+    opacity: 0.9;
+  }
+
+  .quote-render,
+  .store-render {
+    width: 64%;
+    bottom: 4px;
   }
 
   .dock {
